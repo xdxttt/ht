@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B53F5F671634CBBF001DAD4C /* Shop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B53F5F651634CBBF001DAD4C /* Shop.cpp */; };
 		B5A1E7C215F8ED990083A7FA /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5A1E7C115F8ED990083A7FA /* QuartzCore.framework */; };
 		B5A1E7C415F8ED990083A7FA /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5A1E7C315F8ED990083A7FA /* OpenGLES.framework */; };
 		B5A1E7C615F8ED990083A7FA /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5A1E7C515F8ED990083A7FA /* OpenAL.framework */; };
@@ -205,6 +206,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B53F5F651634CBBF001DAD4C /* Shop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Shop.cpp; sourceTree = "<group>"; };
+		B53F5F661634CBBF001DAD4C /* Shop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Shop.h; sourceTree = "<group>"; };
 		B5A1E7BD15F8ED990083A7FA /* Hat Trick.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hat Trick.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5A1E7C115F8ED990083A7FA /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		B5A1E7C315F8ED990083A7FA /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
@@ -1411,6 +1414,8 @@
 				B5A1EA3815F8EE080083A7FA /* Tutorial.h */,
 				B5A1EA0515F8ED9C0083A7FA /* AppDelegate.h */,
 				B5A1EA0615F8ED9C0083A7FA /* AppDelegate.cpp */,
+				B53F5F651634CBBF001DAD4C /* Shop.cpp */,
+				B53F5F661634CBBF001DAD4C /* Shop.h */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -1669,6 +1674,7 @@
 				B5A1EA0715F8ED9C0083A7FA /* AppDelegate.cpp in Sources */,
 				B5A1EA3A15F8EE080083A7FA /* Tutorial.cpp in Sources */,
 				B5F1B8E1160EFEB2001F33EE /* PlayScene.cpp in Sources */,
+				B53F5F671634CBBF001DAD4C /* Shop.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
