@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2008-2010 Ricardo Quesada
 Copyright (c) 2011      Zynga Inc.
 
@@ -26,9 +26,16 @@ THE SOFTWARE.
 #ifndef __CCLABEL_ATLAS_H__
 #define __CCLABEL_ATLAS_H__
 
-#include "CCAtlasNode.h"
+#include "base_nodes/CCAtlasNode.h"
 
 NS_CC_BEGIN
+
+/**
+ * @addtogroup GUI
+ * @{
+ * @addtogroup label
+ * @{
+ */
 
 /** @brief CCLabelAtlas is a subclass of CCAtlasNode.
 
@@ -51,11 +58,32 @@ public:
     { 
         m_sString.clear(); 
     }
+    /** creates the CCLabelAtlas with a string, a char map file(the atlas), the width and height of each element and the starting char of the atlas 
+    @deprecated: This interface will be deprecated sooner or later.
+    */
+    CC_DEPRECATED_ATTRIBUTE static CCLabelAtlas * labelWithString(const char *string, const char *charMapFile, unsigned int itemWidth, unsigned int itemHeight, unsigned int startCharMap);
+    
+    /** creates the CCLabelAtlas with a string and a configuration file
+    @deprecated: This interface will be deprecated sooner or later.
+    @since v2.0
+    */
+    CC_DEPRECATED_ATTRIBUTE static CCLabelAtlas* labelWithString(const char *string, const char *fntFile);
+
     /** creates the CCLabelAtlas with a string, a char map file(the atlas), the width and height of each element and the starting char of the atlas */
-    static CCLabelAtlas * labelWithString(const char *label, const char *charMapFile, unsigned int itemWidth, unsigned int itemHeight, unsigned char startCharMap);
+    static CCLabelAtlas * create(const char *string, const char *charMapFile, unsigned int itemWidth, unsigned int itemHeight, unsigned int startCharMap);
+    
+    /** creates the CCLabelAtlas with a string and a configuration file
+     @since v2.0
+     */
+    static CCLabelAtlas* create(const char *string, const char *fntFile);
 
     /** initializes the CCLabelAtlas with a string, a char map file(the atlas), the width and height of each element and the starting char of the atlas */
-    bool initWithString(const char *label, const char *charMapFile, unsigned int itemWidth, unsigned int itemHeight, unsigned char startCharMap);
+    bool initWithString(const char *string, const char *charMapFile, unsigned int itemWidth, unsigned int itemHeight, unsigned int startCharMap);
+    
+    /** initializes the CCLabelAtlas with a string and a configuration file
+     @since v2.0
+     */
+    bool initWithString(const char *string, const char *fntFile);
     // super methods
     virtual void updateAtlasValues();
     virtual void setString(const char *label);
@@ -64,13 +92,17 @@ public:
     virtual void draw();
 #endif
 
-    virtual CCLabelProtocol* convertToLabelProtocol() { return (CCLabelProtocol*)this; }
 protected:
     // string to render
     std::string m_sString;
     // the first char in the charmap
-    unsigned char m_cMapStartChar;
+    unsigned int m_uMapStartChar;
 };
+
+// end of GUI group
+/// @}
+/// @}
+
 
 NS_CC_END
 

@@ -26,9 +26,14 @@ THE SOFTWARE.
 #define __CCKEYPAD_DELEGATE_H__
 
 
-#include "CCObject.h"
+#include "cocoa/CCObject.h"
 
 NS_CC_BEGIN
+
+/**
+ * @addtogroup input
+ * @{
+ */
 
 class CC_DLL CCKeypadDelegate
 {
@@ -36,7 +41,7 @@ public:
     // The back key clicked
     virtual void keyBackClicked() {}
 
-    // The menu key clicked. only avialble on wophone & android
+    // The menu key clicked. only available on wophone & android
     virtual void keyMenuClicked() {};
 };
 
@@ -64,6 +69,9 @@ public:
 protected:
     CCKeypadDelegate* m_pDelegate;
 };
+
+// end of input group
+/// @} 
 
 NS_CC_END
 

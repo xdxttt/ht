@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2010      Neophit
 Copyright (c) 2010      Ricardo Quesada
 Copyright (c) 2011      Zynga Inc.
@@ -35,7 +35,7 @@ CCTMXObjectGroup::CCTMXObjectGroup()
     :m_tPositionOffset(CCPointZero)
     ,m_sGroupName("")        
 {
-    m_pObjects = CCArray::array();
+    m_pObjects = CCArray::create();
     m_pObjects->retain();
     m_pProperties = new CCDictionary();
 }

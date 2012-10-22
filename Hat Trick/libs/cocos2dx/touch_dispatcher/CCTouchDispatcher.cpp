@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2009      Valentin Milea
 
 http://www.cocos2d-x.org
@@ -25,10 +25,10 @@ THE SOFTWARE.
 
 #include "CCTouchDispatcher.h"
 #include "CCTouchHandler.h"
-#include "CCArray.h"
-#include "CCSet.h"
+#include "cocoa/CCArray.h"
+#include "cocoa/CCSet.h"
 #include "CCTouch.h"
-#include "CCTexture2D.h"
+#include "textures/CCTexture2D.h"
 #include "support/data_support/ccCArray.h"
 #include "ccMacros.h"
 #include <algorithm>
@@ -38,11 +38,10 @@ NS_CC_BEGIN
 /**
  * Used for sort
  */
-static int less(const void* p1, const void* p2)
+static int less(const CCObject* p1, const CCObject* p2)
 {
-    return ((cocos2d::CCTouchHandler*)p1)->getPriority() < ((cocos2d::CCTouchHandler*)p2)->getPriority() ? 1 : -1;
+    return ((CCTouchHandler*)p1)->getPriority() < ((CCTouchHandler*)p2)->getPriority();
 }
-
 
 bool CCTouchDispatcher::isDispatchEvents(void)
 {
@@ -68,11 +67,11 @@ void CCTouchDispatcher::setDispatchEvents(bool bDispatchEvents)
 bool CCTouchDispatcher::init(void)
 {
     m_bDispatchEvents = true;
-    m_pTargetedHandlers = CCArray::arrayWithCapacity(8);
+    m_pTargetedHandlers = CCArray::createWithCapacity(8);
     m_pTargetedHandlers->retain();
-     m_pStandardHandlers = CCArray::arrayWithCapacity(4);
+     m_pStandardHandlers = CCArray::createWithCapacity(4);
     m_pStandardHandlers->retain();
-    m_pHandlersToAdd = CCArray::arrayWithCapacity(8);
+    m_pHandlersToAdd = CCArray::createWithCapacity(8);
     m_pHandlersToAdd->retain();
     m_pHandlersToRemove = ccCArrayNew(8);
 
@@ -137,7 +136,7 @@ void CCTouchDispatcher::addStandardDelegate(CCTouchDelegate *pDelegate, int nPri
     }
     else
     {
-        /* If pHandler is contained in m_pHandlersToRemove, if so remove it from m_pHandlersToRemove and retrun.
+        /* If pHandler is contained in m_pHandlersToRemove, if so remove it from m_pHandlersToRemove and return.
          * Refer issue #752(cocos2d-x)
          */
         if (ccCArrayContainsValue(m_pHandlersToRemove, pDelegate))
@@ -160,7 +159,7 @@ void CCTouchDispatcher::addTargetedDelegate(CCTouchDelegate *pDelegate, int nPri
     }
     else
     {
-        /* If pHandler is contained in m_pHandlersToRemove, if so remove it from m_pHandlersToRemove and retrun.
+        /* If pHandler is contained in m_pHandlersToRemove, if so remove it from m_pHandlersToRemove and return.
          * Refer issue #752(cocos2d-x)
          */
         if (ccCArrayContainsValue(m_pHandlersToRemove, pDelegate))
@@ -217,7 +216,7 @@ void CCTouchDispatcher::removeDelegate(CCTouchDelegate *pDelegate)
     }
     else
     {
-        /* If pHandler is contained in m_pHandlersToAdd, if so remove it from m_pHandlersToAdd and retrun.
+        /* If pHandler is contained in m_pHandlersToAdd, if so remove it from m_pHandlersToAdd and return.
          * Refer issue #752(cocos2d-x)
          */
         CCTouchHandler *pHandler = findHandler(m_pHandlersToAdd, pDelegate);
@@ -293,8 +292,7 @@ CCTouchHandler* CCTouchDispatcher::findHandler(CCArray* pArray, CCTouchDelegate 
 
 void CCTouchDispatcher::rearrangeHandlers(CCArray *pArray)
 {
-    // FIXME: qsort is not supported in bada1.0, so we must implement it ourselves.
-    qsort(pArray->data->arr, pArray->data->num, sizeof(pArray->data->arr[0]), less);
+    std::sort(pArray->data->arr, pArray->data->arr + pArray->data->num, less);
 }
 
 void CCTouchDispatcher::setPriority(int nPriority, CCTouchDelegate *pDelegate)
@@ -306,11 +304,13 @@ void CCTouchDispatcher::setPriority(int nPriority, CCTouchDelegate *pDelegate)
     handler = this->findHandler(pDelegate);
 
     CCAssert(handler != NULL, "");
-
-    handler->setPriority(nPriority);
-
-    this->rearrangeHandlers(m_pTargetedHandlers);
-    this->rearrangeHandlers(m_pStandardHandlers);
+	
+    if (handler->getPriority() != nPriority)
+    {
+        handler->setPriority(nPriority);
+        this->rearrangeHandlers(m_pTargetedHandlers);
+        this->rearrangeHandlers(m_pStandardHandlers);
+    }
 }
 
 //
@@ -365,7 +365,7 @@ void CCTouchDispatcher::touches(CCSet *pTouches, CCEvent *pEvent, unsigned int u
                 } else
                 if (pHandler->getClaimedTouches()->containsObject(pTouch))
                 {
-                    // moved ended cancelled
+                    // moved ended canceled
                     bClaimed = true;
 
                     switch (sHelper.m_type)

@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2010      Ricardo Quesada
 Copyright (c) 2011      Zynga Inc.
 
@@ -26,14 +26,19 @@ THE SOFTWARE.
 #ifndef __CC_ANIMATION_CACHE_H__
 #define __CC_ANIMATION_CACHE_H__
 
-#include "CCObject.h"
-#include "CCDictionary.h"
+#include "cocoa/CCObject.h"
+#include "cocoa/CCDictionary.h"
 
 #include <string>
 
 NS_CC_BEGIN
 
 class CCAnimation;
+
+/**
+ * @addtogroup sprite_nodes
+ * @{
+ */
 
 /** Singleton that manages the Animations.
 It saves in a cache the animations. You should use this class if you want to save your animations in a cache.
@@ -47,7 +52,7 @@ class CC_DLL CCAnimationCache : public CCObject
 public:
     CCAnimationCache();
     ~CCAnimationCache();
-    /** Retruns ths shared instance of the Animation cache */
+    /** Returns the shared instance of the Animation cache */
     static CCAnimationCache* sharedAnimationCache(void);
 
     /** Purges the cache. It releases all the CCAnimation objects and the shared instance.
@@ -89,6 +94,9 @@ private:
     CCDictionary* m_pAnimations;
     static CCAnimationCache* s_pSharedAnimationCache;
 };
+
+// end of sprite_nodes group
+/// @}
 
 NS_CC_END
 

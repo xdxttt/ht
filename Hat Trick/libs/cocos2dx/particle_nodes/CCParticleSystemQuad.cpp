@@ -1,7 +1,7 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2008-2010 Ricardo Quesada
-Copyright (c) 2009        Leonardo Kasperavičius
+Copyright (c) 2009      Leonardo Kasperavičius
 Copyright (c) 2011      Zynga Inc.
 
 http://www.cocos2d-x.org
@@ -27,15 +27,15 @@ THE SOFTWARE.
 
 #include "CCGL.h"
 #include "CCParticleSystemQuad.h"
-#include "CCSpriteFrame.h"
+#include "sprite_nodes/CCSpriteFrame.h"
 #include "CCDirector.h"
 #include "CCParticleBatchNode.h"
-#include "CCTextureAtlas.h"
-#include "CCShaderCache.h"
-#include "ccGLStateCache.h"
-#include "CCGLProgram.h"
+#include "textures/CCTextureAtlas.h"
+#include "shaders/CCShaderCache.h"
+#include "shaders/ccGLStateCache.h"
+#include "shaders/CCGLProgram.h"
 #include "support/TransformUtils.h"
-#include "extensions/CCNotificationCenter/CCNotificationCenter.h"
+#include "support/CCNotificationCenter.h"
 #include "CCEventType.h"
 
 // extern
@@ -67,7 +67,7 @@ bool CCParticleSystemQuad::initWithTotalParticles(unsigned int numberOfParticles
         
         
         // Need to listen the event only when not use batchnode, because it will use VBO
-        extension::CCNotificationCenter::sharedNotificationCenter()->addObserver(this,
+        CCNotificationCenter::sharedNotificationCenter()->addObserver(this,
                                                                       callfuncO_selector(CCParticleSystemQuad::listenBackToForeground),
                                                                       EVNET_COME_TO_FOREGROUND,
                                                                       NULL);
@@ -99,11 +99,16 @@ CCParticleSystemQuad::~CCParticleSystemQuad()
 #endif
     }
     
-    extension::CCNotificationCenter::sharedNotificationCenter()->removeObserver(this, EVNET_COME_TO_FOREGROUND);
+    CCNotificationCenter::sharedNotificationCenter()->removeObserver(this, EVNET_COME_TO_FOREGROUND);
 }
 
 // implementation CCParticleSystemQuad
 CCParticleSystemQuad * CCParticleSystemQuad::particleWithFile(const char *plistFile)
+{
+    return CCParticleSystemQuad::create(plistFile);
+}
+
+CCParticleSystemQuad * CCParticleSystemQuad::create(const char *plistFile)
 {
     CCParticleSystemQuad *pRet = new CCParticleSystemQuad();
     if (pRet && pRet->initWithFile(plistFile))
@@ -114,6 +119,18 @@ CCParticleSystemQuad * CCParticleSystemQuad::particleWithFile(const char *plistF
     CC_SAFE_DELETE(pRet);
     return pRet;
 }
+
+CCParticleSystemQuad * CCParticleSystemQuad::createWithTotalParticles(unsigned int numberOfParticles) {
+    CCParticleSystemQuad *pRet = new CCParticleSystemQuad();
+    if (pRet && pRet->initWithTotalParticles(numberOfParticles))
+    {
+        pRet->autorelease();
+        return pRet;
+    }
+    CC_SAFE_DELETE(pRet);
+    return pRet;
+}
+
 
 // pointRect should be in Texture coordinates, not pixel coordinates
 void CCParticleSystemQuad::initTexCoordsWithRect(const CCRect& pointRect)
@@ -198,7 +215,8 @@ void CCParticleSystemQuad::setTexture(CCTexture2D* texture)
 }
 void CCParticleSystemQuad::setDisplayFrame(CCSpriteFrame *spriteFrame)
 {
-    CCAssert( CCPoint::CCPointEqualToPoint( spriteFrame->getOffsetInPixels() , CCPointZero ), "QuadParticle only supports SpriteFrames with no offsets");
+    CCAssert(spriteFrame->getOffsetInPixels().equals(CCPointZero), 
+             "QuadParticle only supports SpriteFrames with no offsets");
 
     // update texture before updating texture rect
     if ( !m_pTexture || spriteFrame->getTexture()->getName() != m_pTexture->getName())
@@ -236,8 +254,10 @@ void CCParticleSystemQuad::updateQuadWithParticle(tCCParticle* particle, const C
     {
         quad = &(m_pQuads[m_uParticleIdx]);
     }
-    ccColor4B color = {(GLubyte)(particle->color.r * 255), (GLubyte)(particle->color.g * 255), (GLubyte)(particle->color.b * 255), 
-        (GLubyte)(particle->color.a * 255)};
+    ccColor4B color = (m_bOpacityModifyRGB)
+        ? ccc4( particle->color.r*particle->color.a*255, particle->color.g*particle->color.a*255, particle->color.b*particle->color.a*255, particle->color.a*255)
+        : ccc4( particle->color.r*255, particle->color.g*255, particle->color.b*255, particle->color.a*255);
+
     quad->bl.colors = color;
     quad->br.colors = color;
     quad->tl.colors = color;
@@ -373,7 +393,7 @@ void CCParticleSystemQuad::draw()
 
 void CCParticleSystemQuad::setTotalParticles(unsigned int tp)
 {
-    // If we are setting the total numer of particles to a number higher
+    // If we are setting the total number of particles to a number higher
     // than what is allocated, we need to allocate new arrays
     if( tp > m_uAllocatedParticles )
     {
@@ -560,6 +580,22 @@ void CCParticleSystemQuad::setBatchNode(CCParticleBatchNode * batchNode)
 #endif
         }
     }
+}
+
+CCParticleSystemQuad * CCParticleSystemQuad::node()
+{
+    return CCParticleSystemQuad::create();
+}
+
+CCParticleSystemQuad * CCParticleSystemQuad::create() {
+    CCParticleSystemQuad *pParticleSystemQuad = new CCParticleSystemQuad();
+    if (pParticleSystemQuad && pParticleSystemQuad->init())
+    {
+        pParticleSystemQuad->autorelease();
+        return pParticleSystemQuad;
+    }
+    CC_SAFE_DELETE(pParticleSystemQuad);
+    return NULL;
 }
 
 NS_CC_END

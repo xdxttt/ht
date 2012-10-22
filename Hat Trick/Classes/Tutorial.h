@@ -17,13 +17,12 @@ class Tutorial : public cocos2d::CCLayer
 public:
 	// Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone
 	virtual bool init();  
-    
 	// there's no 'id' in cpp, so we recommand to return the exactly class pointer
 	static cocos2d::CCScene* scene();
 	// a selector callback
 	virtual void startCallBack(CCObject* pSender);
     virtual void ccTouchesEnded(cocos2d::CCSet *pTouches, cocos2d::CCEvent *pEvent);
-	LAYER_NODE_FUNC(Tutorial);
+	CREATE_FUNC(Tutorial);
     
     void nextSetp();
     void previousSetp();

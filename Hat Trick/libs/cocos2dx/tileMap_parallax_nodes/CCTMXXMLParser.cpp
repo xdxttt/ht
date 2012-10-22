@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2011        Максим Аксенов 
 Copyright (c) 2009-2010 Ricardo Quesada
 Copyright (c) 2011      Zynga Inc.
@@ -28,11 +28,10 @@ THE SOFTWARE.
 #include <map>
 #include "CCTMXXMLParser.h"
 #include "CCTMXTiledMap.h"
-#include "CCData.h"
 #include "ccMacros.h"
-#include "CCFileUtils.h"
+#include "platform/CCFileUtils.h"
 #include "support/zip_support/ZipUtils.h"
-#include "CCPointExtension.h"
+#include "support/CCPointExtension.h"
 #include "support/base64.h"
 #include "platform/platform.h"
 
@@ -44,7 +43,7 @@ using namespace std;
     #include <libxml/parser.h>
     #include <libxml/tree.h>
     #include <libxml/xmlmemory.h>
-#endf
+#endif
 */
 
 NS_CC_BEGIN
@@ -150,15 +149,15 @@ CCTMXMapInfo * CCTMXMapInfo::formatWithXML(const char* tmxString, const char* re
 
 void CCTMXMapInfo::internalInit(const char* tmxFileName, const char* resourcePath)
 {
-    m_pTilesets = CCArray::array();
+    m_pTilesets = CCArray::create();
     m_pTilesets->retain();
 
-    m_pLayers = CCArray::array();
+    m_pLayers = CCArray::create();
     m_pLayers->retain();
 
     if (tmxFileName != NULL)
     {
-        m_sTMXFileName = CCFileUtils::fullPathFromRelativePath(tmxFileName);
+        m_sTMXFileName = CCFileUtils::sharedFileUtils()->fullPathFromRelativePath(tmxFileName);
     }
     
     if (resourcePath != NULL)
@@ -166,7 +165,7 @@ void CCTMXMapInfo::internalInit(const char* tmxFileName, const char* resourcePat
         m_sResources = resourcePath;
     }
     
-    m_pObjectGroups = CCArray::arrayWithCapacity(4);
+    m_pObjectGroups = CCArray::createWithCapacity(4);
     m_pObjectGroups->retain();
 
     m_pProperties = new CCDictionary();
@@ -284,12 +283,6 @@ bool CCTMXMapInfo::parseXMLString(const char *xmlString)
     return parser.parse(xmlString, len);
 }
 
-bool CCTMXMapInfo::parseXMLData(const CCData* data)
-{
-    //TODO: implementation.
-    return false;
-}
-
 bool CCTMXMapInfo::parseXMLFile(const char *xmlFilename)
 {
     CCSAXParser parser;
@@ -356,20 +349,17 @@ void CCTMXMapInfo::startElement(void *ctx, const char *name, const char **atts)
         std::string externalTilesetFilename = valueForKey("source", attributeDict);
         if (externalTilesetFilename != "")
         {
-            if (m_sTMXFileName.length() == 0)
+            if (m_sTMXFileName.find_last_of("/") != string::npos)
             {
-                string pszFullPath = CCFileUtils::fullPathFromRelativePath(m_sResources.c_str());
-                if (pszFullPath.find_last_of("/\\") != pszFullPath.length()-1)
-                {
-                    pszFullPath.append("/");
-                }
-                
-                externalTilesetFilename = CCFileUtils::fullPathFromRelativeFile(externalTilesetFilename.c_str(), pszFullPath.c_str()  );
+                string dir = m_sTMXFileName.substr(0, m_sTMXFileName.find_last_of("/") + 1);
+                externalTilesetFilename = dir + externalTilesetFilename;
             }
-            else
+            else 
             {
-                externalTilesetFilename = CCFileUtils::fullPathFromRelativeFile(externalTilesetFilename.c_str(), pTMXMapInfo->getTMXFileName());
+                externalTilesetFilename = m_sResources + "/" + externalTilesetFilename;
             }
+            externalTilesetFilename = CCFileUtils::sharedFileUtils()->fullPathFromRelativePath(externalTilesetFilename.c_str());
+            
             pTMXMapInfo->parseXMLFile(externalTilesetFilename.c_str());
         }
         else
@@ -455,19 +445,15 @@ void CCTMXMapInfo::startElement(void *ctx, const char *name, const char **atts)
 
         // build full path
         std::string imagename = valueForKey("source", attributeDict);
-        if (m_sTMXFileName.length() == 0)
-        {
-            string pszFullPath = CCFileUtils::fullPathFromRelativePath(m_sResources.c_str());
-            if (pszFullPath.find_last_of("/\\") != pszFullPath.length()-1)
-            {
-                pszFullPath.append("/");
-            }
 
-            tileset->m_sSourceImage = CCFileUtils::fullPathFromRelativeFile(imagename.c_str(), pszFullPath.c_str()  );
-        }
-        else
+        if (m_sTMXFileName.find_last_of("/") != string::npos)
         {
-            tileset->m_sSourceImage = CCFileUtils::fullPathFromRelativeFile(imagename.c_str(), pTMXMapInfo->getTMXFileName());
+            string dir = m_sTMXFileName.substr(0, m_sTMXFileName.find_last_of("/") + 1);
+            tileset->m_sSourceImage = dir + imagename;
+        }
+        else 
+        {
+            tileset->m_sSourceImage = m_sResources + (m_sResources.size() ? "/" : "") + imagename;
         }
     } 
     else if(elementName == "data")
@@ -666,7 +652,7 @@ void CCTMXMapInfo::endElement(void *ctx, const char *name)
             int inflatedLen = ZipUtils::ccInflateMemoryWithHint(buffer, len, &deflated, sizeHint);
             CCAssert(inflatedLen == sizeHint, "");
 
-            inflatedLen = (size_t)&inflatedLen; // XXX: to avoid warings in compiler
+            inflatedLen = (size_t)&inflatedLen; // XXX: to avoid warnings in compiler
             
             delete [] buffer;
             buffer = NULL;

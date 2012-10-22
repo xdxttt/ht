@@ -25,7 +25,7 @@
 #include <libxml/tree.h>
 #include <libxml/xmlmemory.h>
 #include "CCSAXParser.h"
-#include "CCDictionary.h"
+#include "cocoa/CCDictionary.h"
 #include "CCFileUtils.h"
 
 NS_CC_BEGIN
@@ -49,7 +49,7 @@ bool CCSAXParser::init(const char *pszEncoding)
 bool CCSAXParser::parse(const char* pXMLData, unsigned int uDataLength)
 {
     /*
-     * this initialize the library and check potential ABI mismatches
+     * this initializes the library and checks potential ABI mismatches
      * between the version it was compiled for and the actual shared
      * library used.
      */
@@ -83,15 +83,15 @@ bool CCSAXParser::parse(const char* pXMLData, unsigned int uDataLength)
 
 bool CCSAXParser::parse(const char *pszFile)
 {
-    CCFileData data(pszFile, "rt");
-    unsigned long size = data.getSize();
-    char *pBuffer = (char*) data.getBuffer();
-    
-    if (!pBuffer)
+    bool bRet = false;
+    unsigned long size = 0;
+    char* pBuffer = (char*)CCFileUtils::sharedFileUtils()->getFileData(pszFile, "rt", &size);
+    if (pBuffer != NULL && size > 0)
     {
-        return false;
+        bRet = parse(pBuffer, size);
     }
-    return parse(pBuffer, size);
+    CC_SAFE_DELETE_ARRAY(pBuffer);
+    return bRet;
 }
 
 void CCSAXParser::startElement(void *ctx, const CC_XML_CHAR *name, const CC_XML_CHAR **atts)

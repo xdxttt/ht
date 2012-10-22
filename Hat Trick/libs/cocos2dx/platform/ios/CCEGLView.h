@@ -25,8 +25,8 @@ THE SOFTWARE.
 #ifndef __CC_EGLVIEW_IPHONE_H__
 #define __CC_EGLVIEW_IPHONE_H__
 
-#include "CCCommon.h"
-#include "CCEGLViewProtocol.h"
+#include "platform/CCCommon.h"
+#include "platform/CCEGLViewProtocol.h"
 
 NS_CC_BEGIN
 
@@ -38,23 +38,17 @@ public:
     CCEGLView();
    ~CCEGLView();
 
-    CCSize  getSize();
-    bool    isOpenGLReady();
-    bool    canSetContentScaleFactor();
-    bool    isIpad();
-    void    setContentScaleFactor(float contentScaleFactor);
-    virtual CCSize  getFrameSize();
+    virtual bool    isOpenGLReady();
+    virtual bool    setContentScaleFactor(float contentScaleFactor);
+    virtual bool    enableRetina();
     
     // keep compatible
-    void    end();
-    void    swapBuffers();
-
+    virtual void    end();
+    virtual void    swapBuffers();
     
-    float getMainScreenScale();
+    virtual void setIMEKeyboardState(bool bOpen);
     
-    void setIMEKeyboardState(bool bOpen);
-    
-    static CCEGLView& sharedOpenGLView();
+    static CCEGLView* sharedOpenGLView();
 
 };
 

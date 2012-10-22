@@ -1,9 +1,9 @@
 //
-//  Hat_TrickAppController.mm
-//  Hat Trick
+//  takelibAppController.mm
+//  takelib
 //
-//  Created by xdxttt on 9/6/12.
-//  Copyright __MyCompanyName__ 2012. All rights reserved.
+//  Created by xudexin on 12-10-22.
+//  Copyright __MyCompanyName__ 2012年. All rights reserved.
 //
 #import <UIKit/UIKit.h>
 #import "AppController.h"
@@ -12,8 +12,11 @@
 #import "AppDelegate.h"
 
 #import "RootViewController.h"
-#import "MobClick.h"
+
 @implementation AppController
+
+@synthesize window;
+@synthesize viewController;
 
 #pragma mark -
 #pragma mark Application lifecycle
@@ -22,9 +25,9 @@
 static AppDelegate s_sharedApplication;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-
+    
     // Override point for customization after application launch.
-
+    
     // Add the view controller's view to the window and display.
     window = [[UIWindow alloc] initWithFrame: [[UIScreen mainScreen] bounds]];
     EAGLView *__glView = [EAGLView viewWithFrame: [window bounds]
@@ -33,22 +36,30 @@ static AppDelegate s_sharedApplication;
                               preserveBackbuffer: NO
                                       sharegroup: nil
                                    multiSampling: NO
-                                 numberOfSamples: 0 ];
-
+                                 numberOfSamples:0 ];
+    
     // Use RootViewController manage EAGLView
     viewController = [[RootViewController alloc] initWithNibName:nil bundle:nil];
     viewController.wantsFullScreenLayout = YES;
     viewController.view = __glView;
-
+    
     // Set RootViewController to window
-    [window addSubview: viewController.view];
+    if ( [[UIDevice currentDevice].systemVersion floatValue] < 6.0)
+    {
+        // warning: addSubView doesn't work on iOS6
+        [window addSubview: viewController.view];
+    }
+    else
+    {
+        // use this method on ios6
+        [window setRootViewController:viewController];
+    }
+    
     [window makeKeyAndVisible];
-
+    
     [[UIApplication sharedApplication] setStatusBarHidden: YES];
-
-    cocos2d::CCApplication::sharedApplication().run();
-    [MobClick startWithAppkey:@"5039c7a65270151f0d0001b6" reportPolicy:REALTIME channelId:nil];
-    [viewController.view setMultipleTouchEnabled:YES];
+    
+    cocos2d::CCApplication::sharedApplication()->run();
     return YES;
 }
 
@@ -73,14 +84,14 @@ static AppDelegate s_sharedApplication;
      Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
      If your application supports background execution, called instead of applicationWillTerminate: when the user quits.
      */
-    cocos2d::CCApplication::sharedApplication().applicationDidEnterBackground();
+    cocos2d::CCApplication::sharedApplication()->applicationDidEnterBackground();
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
     /*
      Called as part of  transition from the background to the inactive state: here you can undo many of the changes made on entering the background.
      */
-    cocos2d::CCApplication::sharedApplication().applicationWillEnterForeground();
+    cocos2d::CCApplication::sharedApplication()->applicationWillEnterForeground();
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
@@ -98,7 +109,7 @@ static AppDelegate s_sharedApplication;
     /*
      Free up as much memory as possible by purging cached data objects that can be recreated (or reloaded from disk) later.
      */
-     cocos2d::CCDirector::sharedDirector()->purgeCachedData();
+    cocos2d::CCDirector::sharedDirector()->purgeCachedData();
 }
 
 

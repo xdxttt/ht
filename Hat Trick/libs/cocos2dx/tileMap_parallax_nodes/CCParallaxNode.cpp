@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2009-2010 Ricardo Quesada
 Copyright (c) 2011      Zynga Inc.
 
@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ****************************************************************************/
 #include "CCParallaxNode.h"
-#include "CCPointExtension.h"
+#include "support/CCPointExtension.h"
 #include "support/data_support/ccCArray.h"
 
 NS_CC_BEGIN
@@ -64,12 +64,19 @@ CCParallaxNode::~CCParallaxNode()
         m_pParallaxArray = NULL;
     }
 }
+
 CCParallaxNode * CCParallaxNode::node()
+{
+    return CCParallaxNode::create();
+}
+
+CCParallaxNode * CCParallaxNode::create()
 {
     CCParallaxNode *pRet = new CCParallaxNode();
     pRet->autorelease();
     return pRet;
 }
+
 void CCParallaxNode::addChild(CCNode * child, unsigned int zOrder, int tag)
 {
     CC_UNUSED_PARAM(zOrder);
@@ -131,7 +138,7 @@ void CCParallaxNode::visit()
     //    CCPoint pos = position_;
     //    CCPoint    pos = [self convertToWorldSpace:CCPointZero];
     CCPoint pos = this->absolutePosition();
-    if( ! CCPoint::CCPointEqualToPoint(pos, m_tLastPosition) )
+    if( ! pos.equals(m_tLastPosition) )
     {
         for(unsigned int i=0; i < m_pParallaxArray->num; i++ ) 
         {

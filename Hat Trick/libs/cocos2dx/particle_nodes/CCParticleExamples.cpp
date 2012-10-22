@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2008-2010 Ricardo Quesada
 Copyright (c) 2011      Zynga Inc.
  
@@ -25,8 +25,8 @@ THE SOFTWARE.
 ****************************************************************************/
 #include "CCParticleExamples.h"
 #include "CCDirector.h"
-#include "CCTextureCache.h"
-#include "CCPointExtension.h"
+#include "textures/CCTextureCache.h"
+#include "support/CCPointExtension.h"
 
 NS_CC_BEGIN
 //
@@ -94,7 +94,7 @@ bool CCParticleFire::initWithTotalParticles(unsigned int numberOfParticles)
         m_tEndColorVar.a = 0.0f;
 
         // additive
-        this->setIsBlendAdditive(true);
+        this->setBlendAdditive(true);
         return true;
     }
     return false;
@@ -162,7 +162,7 @@ bool CCParticleFireworks::initWithTotalParticles(unsigned int numberOfParticles)
         m_fEndSize = kCCParticleStartSizeEqualToEndSize;
 
         // additive
-        this->setIsBlendAdditive(false);
+        this->setBlendAdditive(false);
         return true;
     }
     return false;
@@ -175,7 +175,7 @@ bool CCParticleSun::initWithTotalParticles(unsigned int numberOfParticles)
     if( CCParticleSystemQuad::initWithTotalParticles(numberOfParticles) )
     {
         // additive
-        this->setIsBlendAdditive(true);
+        this->setBlendAdditive(true);
 
         // duration
         m_fDuration = kCCParticleDurationInfinity;
@@ -263,7 +263,7 @@ bool CCParticleGalaxy::initWithTotalParticles(unsigned int numberOfParticles)
         modeA.radialAccel = -80;
         modeA.radialAccelVar = 0;
 
-        // Gravity Mode: tagential
+        // Gravity Mode: tangential
         modeA.tangentialAccel = 80;
         modeA.tangentialAccelVar = 0;
 
@@ -307,7 +307,7 @@ bool CCParticleGalaxy::initWithTotalParticles(unsigned int numberOfParticles)
         m_tEndColorVar.a = 0.0f;
 
         // additive
-        this->setIsBlendAdditive(true);
+        this->setBlendAdditive(true);
         return true;
     }
     return false;
@@ -337,7 +337,7 @@ bool CCParticleFlower::initWithTotalParticles(unsigned int numberOfParticles)
         modeA.radialAccel = -60;
         modeA.radialAccelVar = 0;
 
-        // Gravity Mode: tagential
+        // Gravity Mode: tangential
         modeA.tangentialAccel = 15;
         modeA.tangentialAccelVar = 0;
 
@@ -381,7 +381,7 @@ bool CCParticleFlower::initWithTotalParticles(unsigned int numberOfParticles)
         m_tEndColorVar.a = 0.0f;
 
         // additive
-        this->setIsBlendAdditive(true);
+        this->setBlendAdditive(true);
         return true;
     }
     return false;
@@ -410,7 +410,7 @@ bool CCParticleMeteor::initWithTotalParticles(unsigned int numberOfParticles)
         modeA.radialAccel = 0;
         modeA.radialAccelVar = 0;
 
-        // Gravity Mode: tagential
+        // Gravity Mode: tangential
         modeA.tangentialAccel = 0;
         modeA.tangentialAccelVar = 0;
 
@@ -454,7 +454,7 @@ bool CCParticleMeteor::initWithTotalParticles(unsigned int numberOfParticles)
         m_tEndColorVar.a = 0.0f;
 
         // additive
-        this->setIsBlendAdditive(true);
+        this->setBlendAdditive(true);
         return true;
     }
     return false;
@@ -484,7 +484,7 @@ bool CCParticleSpiral::initWithTotalParticles(unsigned int numberOfParticles)
         modeA.radialAccel = -380;
         modeA.radialAccelVar = 0;
 
-        // Gravity Mode: tagential
+        // Gravity Mode: tangential
         modeA.tangentialAccel = 45;
         modeA.tangentialAccelVar = 0;
 
@@ -528,7 +528,7 @@ bool CCParticleSpiral::initWithTotalParticles(unsigned int numberOfParticles)
         m_tEndColorVar.a = 0.0f;
 
         // additive
-        this->setIsBlendAdditive(false);
+        this->setBlendAdditive(false);
         return true;
     }
     return false;
@@ -557,7 +557,7 @@ bool CCParticleExplosion::initWithTotalParticles(unsigned int numberOfParticles)
         modeA.radialAccel = 0;
         modeA.radialAccelVar = 0;
 
-        // Gravity Mode: tagential
+        // Gravity Mode: tangential
         modeA.tangentialAccel = 0;
         modeA.tangentialAccelVar = 0;
 
@@ -601,7 +601,7 @@ bool CCParticleExplosion::initWithTotalParticles(unsigned int numberOfParticles)
         m_tEndColorVar.a = 0.0f;
 
         // additive
-        this->setIsBlendAdditive(false);
+        this->setBlendAdditive(false);
         return true;
     }
     return false;
@@ -671,7 +671,7 @@ bool CCParticleSmoke::initWithTotalParticles(unsigned int numberOfParticles)
         m_tEndColorVar.a = 0.0f;
 
         // additive
-        this->setIsBlendAdditive(false);
+        this->setBlendAdditive(false);
         return true;
     }
     return false;
@@ -700,7 +700,7 @@ bool CCParticleSnow::initWithTotalParticles(unsigned int numberOfParticles)
         modeA.radialAccel = 0;
         modeA.radialAccelVar = 1;
 
-        // Gravity mode: tagential
+        // Gravity mode: tangential
         modeA.tangentialAccel = 0;
         modeA.tangentialAccelVar = 1;
 
@@ -744,7 +744,7 @@ bool CCParticleSnow::initWithTotalParticles(unsigned int numberOfParticles)
         m_tEndColorVar.a = 0.0f;
 
         // additive
-        this->setIsBlendAdditive(false);
+        this->setBlendAdditive(false);
         return true;
     }
     return false;
@@ -768,7 +768,7 @@ bool CCParticleRain::initWithTotalParticles(unsigned int numberOfParticles)
         modeA.radialAccel = 0;
         modeA.radialAccelVar = 1;
 
-        // Gravity Mode: tagential
+        // Gravity Mode: tangential
         modeA.tangentialAccel = 0;
         modeA.tangentialAccelVar = 1;
 
@@ -817,7 +817,7 @@ bool CCParticleRain::initWithTotalParticles(unsigned int numberOfParticles)
         m_tEndColorVar.a = 0.0f;
 
         // additive
-        this->setIsBlendAdditive(false);
+        this->setBlendAdditive(false);
         return true;
     }
     return false;

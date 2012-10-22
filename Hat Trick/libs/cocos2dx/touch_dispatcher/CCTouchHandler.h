@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2009      Valentin Milea
 
 http://www.cocos2d-x.org
@@ -28,10 +28,15 @@ THE SOFTWARE.
 
 #include "CCTouchDelegateProtocol.h"
 #include "CCTouchDispatcher.h"
-#include "CCObject.h"
-#include "CCSet.h"
+#include "cocoa/CCObject.h"
+#include "cocoa/CCSet.h"
 
 NS_CC_BEGIN
+
+/**
+ * @addtogroup input
+ * @{
+ */
 
 /**
  CCTouchHandler
@@ -68,7 +73,7 @@ protected:
 };
 
 /** CCStandardTouchHandler
- It forwardes each event to the delegate.
+ It forwards each event to the delegate.
  */
 class CC_DLL  CCStandardTouchHandler : public CCTouchHandler
 {
@@ -83,7 +88,7 @@ public:
 
 /**
  CCTargetedTouchHandler
- Object than contains the claimed touches and if it swallos touches.
+ Object than contains the claimed touches and if it swallows touches.
  Used internally by TouchDispatcher
  */
 class CC_DLL  CCTargetedTouchHandler : public CCTouchHandler
@@ -109,6 +114,9 @@ protected:
     bool m_bSwallowsTouches;
     CCSet *m_pClaimedTouches;
 };
+
+// end of input group
+/// @}
 
 NS_CC_END
 

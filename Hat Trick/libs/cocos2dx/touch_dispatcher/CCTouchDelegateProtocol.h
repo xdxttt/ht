@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2009      Valentin Milea
 
 http://www.cocos2d-x.org
@@ -26,7 +26,7 @@ THE SOFTWARE.
 #ifndef __TOUCH_DISPATHCHER_CCTOUCH_DELEGATE_PROTOCOL_H__
 #define __TOUCH_DISPATHCHER_CCTOUCH_DELEGATE_PROTOCOL_H__
 
-#include "CCObject.h"
+#include "cocoa/CCObject.h"
 #include "ccConfig.h"
 
 NS_CC_BEGIN
@@ -35,7 +35,12 @@ class CCTouch;
 class CCEvent;
 class CCSet;
 class CCTouchDispatcher;
-    
+
+/**
+ * @addtogroup input
+ * @{
+ */
+
 class CC_DLL CCTouchDelegate
 {
 public:
@@ -67,7 +72,7 @@ public:
  them. You get exactly one UITouch per call.
  - 2. You can *claim* a UITouch by returning YES in ccTouchBegan. Updates of claimed
  touches are sent only to the delegate(s) that claimed them. So if you get a move/
- ended/cancelled update you're sure it's your touch. This frees you from doing a
+ ended/canceled update you're sure it's your touch. This frees you from doing a
  lot of checks when doing multi-touch. 
 
  (The name TargetedTouchDelegate relates to updates "targeting" their specific
@@ -89,7 +94,7 @@ public:
  };
  
 /** @brief
- This type of delegate is the same one used by CocoaTouch. You will receive all the events (Began,Moved,Ended,Cancelled).
+ This type of delegate is the same one used by CocoaTouch. You will receive all the events (Began,Moved,Ended,Canceled).
  @since v0.8
  */
  class CC_DLL CCStandardTouchDelegate : public CCTouchDelegate
@@ -101,6 +106,9 @@ public:
      virtual void ccTouchesEnded(CCSet *pTouches, CCEvent *pEvent) {CC_UNUSED_PARAM(pTouches); CC_UNUSED_PARAM(pEvent);}
     virtual void ccTouchesCancelled(CCSet *pTouches, CCEvent *pEvent) {CC_UNUSED_PARAM(pTouches); CC_UNUSED_PARAM(pEvent);}
  };
+
+// end of input group
+/// @}
 
 NS_CC_END
 

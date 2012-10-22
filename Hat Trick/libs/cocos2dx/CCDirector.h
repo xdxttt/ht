@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2008-2010 Ricardo Quesada
 Copyright (c) 2011      Zynga Inc.
 
@@ -27,15 +27,23 @@ THE SOFTWARE.
 #ifndef __CCDIRECTOR_H__
 #define __CCDIRECTOR_H__
 
-#include "CCPlatformMacros.h"
-#include "CCObject.h"
+#include "platform/CCPlatformMacros.h"
+#include "cocoa/CCObject.h"
 #include "ccTypes.h"
-#include "CCGeometry.h"
-#include "CCArray.h"
+#include "cocoa/CCGeometry.h"
+#include "cocoa/CCArray.h"
 #include "CCGL.h"
 #include "kazmath/mat4.h"
+#include "label_nodes/CCLabelTTF.h"
+#include "ccTypeInfo.h"
+
 
 NS_CC_BEGIN
+
+/**
+ * @addtogroup base_nodes
+ * @{
+ */
 
 /** @typedef ccDirectorProjection
  Possible OpenGL projections used by director
@@ -50,12 +58,12 @@ typedef enum {
     /// it calls "updateProjection" on the projection delegate.
     kCCDirectorProjectionCustom,
     
-    /// Detault projection is 3D projection
+    /// Default projection is 3D projection
     kCCDirectorProjectionDefault = kCCDirectorProjection3D,
 } ccDirectorProjection;
 
 /* Forward declarations. */
-class CCLabelBMFont;
+class CCLabelAtlas;
 class CCScene;
 class CCEGLView;
 class CCDirectorDelegate;
@@ -75,7 +83,7 @@ and when to execute the Scenes.
   - setting the OpenGL pixel format (default on is RGB565)
   - setting the OpenGL buffer depth (default one is 0-bit)
   - setting the projection (default one is 3D)
-  - setting the orientation (default one is Protrait)
+  - setting the orientation (default one is Portrait)
  
  Since the CCDirector is a singleton, the standard way to use it is by calling:
   _ CCDirector::sharedDirector()->methodName();
@@ -86,12 +94,16 @@ and when to execute the Scenes.
   - GL_COLOR_ARRAY is enabled
   - GL_TEXTURE_COORD_ARRAY is enabled
 */
-class CC_DLL CCDirector : public CCObject
+class CC_DLL CCDirector : public CCObject, public TypeInfo
 {
 public:
     CCDirector(void);
     virtual ~CCDirector(void);
     virtual bool init(void);
+    virtual long getClassTypeInfo() {
+		static const long id = cocos2d::getHashCodeByString(typeid(cocos2d::CCDirector).name());
+		return id;
+    }
 
     // attribute
 
@@ -120,9 +132,9 @@ public:
 
     /** Whether or not the Director is paused */
     inline bool isPaused(void) { return m_bPaused; }
-    
+
     /** How many frames were called since the director started */
-    inline unsigned int getFrames(void) { return m_uFrames; }
+    inline unsigned int getTotalFrames(void) { return m_uTotalFrames; }
     
     /** Sets an OpenGL projection
      @since v0.8.2
@@ -159,6 +171,16 @@ public:
     /** returns the size of the OpenGL view in pixels.
     */
     CCSize getWinSizeInPixels(void);
+    
+    /** returns visible size of the OpenGL view in points.
+     *  the value is equal to getWinSize if don't invoke
+     *  CCEGLView::setDesignResolutionSize()
+     */
+    CCSize getVisibleSize();
+    
+    /** returns visible origin of the OpenGL view in points.
+     */
+    CCPoint getVisibleOrigin();
 
     /** changes the projection size */
     void reshapeProjection(const CCSize& newWindowSize);
@@ -200,6 +222,13 @@ public:
      */
     void popScene(void);
 
+    /**Pops out all scenes from the queue until the root scene in the queue.
+     * This scene will replace the running one.
+     * The running scene will be deleted. If there are no more scenes in the stack the execution is terminated.
+     * ONLY call it if there is a running scene.
+     */
+    void popToRootScene(void);
+
     /** Replaces the running scene with a new one. The running scene is terminated.
      * ONLY call it if there is a running scene.
      */
@@ -208,10 +237,6 @@ public:
     /** Ends the execution, releases the running scene.
      It doesn't remove the OpenGL view from its parent. You have to do it manually.
      */
-
-    /* end is key word of lua, use other name to export to lua. */
-    inline void endToLua(void){end();}
-
     void end(void);
 
     /** Pauses the running scene.
@@ -268,11 +293,8 @@ public:
     Only available when compiled using SDK >= 4.0.
     @since v0.99.4
     */
-    void setContentScaleFactor(CCFloat scaleFactor);
-    CCFloat getContentScaleFactor(void);
-
-    typedef void(*WatcherCallbackFun)(void *pSender);
-    void setWatcherCallbackFun(void *pSender, WatcherCallbackFun fun);
+    void setContentScaleFactor(float scaleFactor);
+    float getContentScaleFactor(void);
 
 public:
     /** CCScheduler associated with this director
@@ -329,20 +351,20 @@ protected:
     bool m_bLandscape;
     
     bool m_bDisplayStats;
-    ccTime m_fAccumDt;
-    ccTime m_fFrameRate;
+    float m_fAccumDt;
+    float m_fFrameRate;
     
-    CCLabelBMFont *m_pFPSLabel;
-    CCLabelBMFont *m_pSPFLabel;
-    CCLabelBMFont *m_pDrawsLabel;
+    CCLabelTTF *m_pFPSLabel;
+    CCLabelTTF *m_pSPFLabel;
+    CCLabelTTF *m_pDrawsLabel;
     
-    /* is the running scene paused */
+    /** Whether or not the Director is paused */
     bool m_bPaused;
-    
+
     /* How many frames were called since the director started */
     unsigned int m_uTotalFrames;
     unsigned int m_uFrames;
-    ccTime m_fSecondsPerFrame;
+    float m_fSecondsPerFrame;
      
     /* The running scene */
     CCScene *m_pRunningScene;
@@ -361,7 +383,7 @@ protected:
     struct cc_timeval *m_pLastUpdate;
 
     /* delta time since last tick to main loop */
-    ccTime m_fDeltaTime;
+    float m_fDeltaTime;
 
     /* whether or not the next delta time will be zero */
     bool m_bNextDeltaTimeZero;
@@ -376,7 +398,7 @@ protected:
     CCSize m_obWinSizeInPixels;
     
     /* content scale factor */
-    CCFloat    m_fContentScaleFactor;
+    float    m_fContentScaleFactor;
 
     /* store the fps string */
     char *m_pszFPS;
@@ -389,10 +411,9 @@ protected:
 
     /* contentScaleFactor could be simulated */
     bool m_bIsContentScaleSupported;
-
-    WatcherCallbackFun m_pWatcherFun;
-    void *m_pWatcherSender;
-
+    
+    // CCEGLViewProtocol will recreate stats labels to fit visible rect
+    friend class CCEGLViewProtocol;
 };
 
 /** 
@@ -419,6 +440,9 @@ public:
 protected:
     bool m_bInvalid;
 };
+
+// end of base_node group
+/// @}
 
 NS_CC_END
 

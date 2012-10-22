@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2009-2010 Ricardo Quesada
 Copyright (C) 2009      Matt Oswald
 Copyright (c) 2011      Zynga Inc.
@@ -28,13 +28,20 @@ THE SOFTWARE.
 #ifndef __CC_SPRITE_BATCH_NODE_H__
 #define __CC_SPRITE_BATCH_NODE_H__
 
-#include "CCNode.h"
+#include "base_nodes/CCNode.h"
 #include "CCProtocols.h"
-#include "CCTextureAtlas.h"
+#include "textures/CCTextureAtlas.h"
 #include "ccMacros.h"
-#include "CCArray.h"
+#include "cocoa/CCArray.h"
 
 NS_CC_BEGIN
+
+/**
+ * @addtogroup sprite_nodes
+ * @{
+ */
+
+#define kDefaultSpriteBatchCapacity   29
 
 class CCSprite;
 
@@ -74,27 +81,35 @@ public:
 
     inline CCArray* getDescendants(void) { return m_pobDescendants; }
 
-    /** creates a CCSpriteBatchNode with a texture2d and a default capacity of 29 children.
+    /** creates a CCSpriteBatchNode with a texture2d and capacity of children.
     The capacity will be increased in 33% in runtime if it run out of space.
+    @deprecated: This interface will be deprecated sooner or later.
     */
-    static CCSpriteBatchNode* batchNodeWithTexture(CCTexture2D *tex);
+    CC_DEPRECATED_ATTRIBUTE static CCSpriteBatchNode* batchNodeWithTexture(CCTexture2D* tex, unsigned int capacity = kDefaultSpriteBatchCapacity);
+
+    /** creates a CCSpriteBatchNode with a file image (.png, .jpeg, .pvr, etc) and capacity of children.
+    The capacity will be increased in 33% in runtime if it run out of space.
+    The file will be loaded using the TextureMgr.
+    @deprecated: This interface will be deprecated sooner or later.
+    */
+    CC_DEPRECATED_ATTRIBUTE static CCSpriteBatchNode* batchNodeWithFile(const char* fileImage, unsigned int capacity = kDefaultSpriteBatchCapacity);
 
     /** creates a CCSpriteBatchNode with a texture2d and capacity of children.
     The capacity will be increased in 33% in runtime if it run out of space.
     */
-    static CCSpriteBatchNode* batchNodeWithTexture(CCTexture2D* tex, unsigned int capacity);
-
-    /** creates a CCSpriteBatchNode with a file image (.png, .jpeg, .pvr, etc) with a default capacity of 29 children.
-    The capacity will be increased in 33% in runtime if it run out of space.
-    The file will be loaded using the TextureMgr.
-    */
-    static CCSpriteBatchNode* batchNodeWithFile(const char* fileImage);
+    static CCSpriteBatchNode* createWithTexture(CCTexture2D* tex, unsigned int capacity);
+    static CCSpriteBatchNode* createWithTexture(CCTexture2D* tex) {
+        return CCSpriteBatchNode::createWithTexture(tex, kDefaultSpriteBatchCapacity);
+    }
 
     /** creates a CCSpriteBatchNode with a file image (.png, .jpeg, .pvr, etc) and capacity of children.
     The capacity will be increased in 33% in runtime if it run out of space.
     The file will be loaded using the TextureMgr.
     */
-    static CCSpriteBatchNode* batchNodeWithFile(const char* fileImage, unsigned int capacity);
+    static CCSpriteBatchNode* create(const char* fileImage, unsigned int capacity);
+    static CCSpriteBatchNode* create(const char* fileImage) {
+        return CCSpriteBatchNode::create(fileImage, kDefaultSpriteBatchCapacity);
+    }
 
     /** initializes a CCSpriteBatchNode with a texture2d and capacity of children.
     The capacity will be increased in 33% in runtime if it run out of space.
@@ -105,6 +120,7 @@ public:
     The file will be loaded using the TextureMgr.
     */
     bool initWithFile(const char* fileImage, unsigned int capacity);
+    bool init();
 
     void increaseAtlasCapacity();
 
@@ -141,12 +157,12 @@ public:
     virtual void draw(void);
 
 protected:
-    /* IMPORTANT XXX IMPORTNAT:
+    /* IMPORTANT XXX IMPORTANT:
     * These 2 methods can't be part of CCTMXLayer since they call [super add...], and CCSpriteSheet#add SHALL not be called
     */
 
     /* Adds a quad into the texture atlas but it won't be added into the children array.
-    This method should be called only when you are dealing with very big AtlasSrite and when most of the CCSprite won't be updated.
+    This method should be called only when you are dealing with very big AtlasSprite and when most of the CCSprite won't be updated.
     For example: a tile map (CCTMXMap) or a label with lots of characters (BitmapFontAtlas)
     */
     void addQuadFromSprite(CCSprite *sprite, unsigned int index);
@@ -164,9 +180,12 @@ protected:
     CCTextureAtlas *m_pobTextureAtlas;
     ccBlendFunc m_blendFunc;
 
-    // all descendants: chlidren, gran children, etc...
+    // all descendants: children, gran children, etc...
     CCArray* m_pobDescendants;
 };
+
+// end of sprite_nodes group
+/// @}
 
 NS_CC_END
 

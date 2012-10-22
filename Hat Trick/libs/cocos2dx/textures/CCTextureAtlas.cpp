@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2008-2010 Ricardo Quesada
 Copyright (c) 2011      Zynga Inc.
 
@@ -28,13 +28,13 @@ THE SOFTWARE.
 #include "CCTextureAtlas.h"
 #include "CCTextureCache.h"
 #include "ccMacros.h"
-#include "CCGLProgram.h"
-#include "ccGLStateCache.h"
-#include "extensions/CCNotificationCenter/CCNotificationCenter.h"
+#include "shaders/CCGLProgram.h"
+#include "shaders/ccGLStateCache.h"
+#include "support/CCNotificationCenter.h"
 #include "CCEventType.h"
 // support
 #include "CCTexture2D.h"
-#include "CCString.h"
+#include "cocoa/CCString.h"
 #include <stdlib.h>
 
 //According to some tests GL_TRIANGLE_STRIP is slower, MUCH slower. Probably I'm doing something very wrong
@@ -64,7 +64,7 @@ CCTextureAtlas::~CCTextureAtlas()
 #endif
     CC_SAFE_RELEASE(m_pTexture);
     
-    extension::CCNotificationCenter::sharedNotificationCenter()->removeObserver(this, EVNET_COME_TO_FOREGROUND);
+    CCNotificationCenter::sharedNotificationCenter()->removeObserver(this, EVNET_COME_TO_FOREGROUND);
 }
 
 unsigned int CCTextureAtlas::getTotalQuads()
@@ -102,8 +102,12 @@ void CCTextureAtlas::setQuads(ccV3F_C4B_T2F_Quad *var)
 }
 
 // TextureAtlas - alloc & init
-
 CCTextureAtlas * CCTextureAtlas::textureAtlasWithFile(const char* file, unsigned int capacity)
+{
+    return CCTextureAtlas::create(file, capacity);
+}
+
+CCTextureAtlas * CCTextureAtlas::create(const char* file, unsigned int capacity)
 {
     CCTextureAtlas * pTextureAtlas = new CCTextureAtlas();
     if(pTextureAtlas && pTextureAtlas->initWithFile(file, capacity))
@@ -116,6 +120,11 @@ CCTextureAtlas * CCTextureAtlas::textureAtlasWithFile(const char* file, unsigned
 }
 
 CCTextureAtlas * CCTextureAtlas::textureAtlasWithTexture(CCTexture2D *texture, unsigned int capacity)
+{
+    return CCTextureAtlas::createWithTexture(texture, capacity);
+}
+
+CCTextureAtlas * CCTextureAtlas::createWithTexture(CCTexture2D *texture, unsigned int capacity)
 {
     CCTextureAtlas * pTextureAtlas = new CCTextureAtlas();
     if (pTextureAtlas && pTextureAtlas->initWithTexture(texture, capacity))
@@ -139,9 +148,7 @@ bool CCTextureAtlas::initWithFile(const char * file, unsigned int capacity)
     else
     {
         CCLOG("cocos2d: Could not open file: %s", file);
-        delete this;
-
-        return NULL;
+        return false;
     }
 }
 
@@ -177,7 +184,7 @@ bool CCTextureAtlas::initWithTexture(CCTexture2D *texture, unsigned int capacity
     memset( m_pIndices, 0, m_uCapacity * 6 * sizeof(GLushort) );
     
     // listen the event when app go to background
-    extension::CCNotificationCenter::sharedNotificationCenter()->addObserver(this,
+    CCNotificationCenter::sharedNotificationCenter()->addObserver(this,
                                                            callfuncO_selector(CCTextureAtlas::listenBackToForeground),
                                                            EVNET_COME_TO_FOREGROUND,
                                                            NULL);
@@ -209,7 +216,7 @@ void CCTextureAtlas::listenBackToForeground(CCObject *obj)
 
 const char* CCTextureAtlas::description()
 {
-    return CCString::stringWithFormat("<CCTextureAtlas | totalQuads = %u>", m_uTotalQuads)->getCString();
+    return CCString::createWithFormat("<CCTextureAtlas | totalQuads = %u>", m_uTotalQuads)->getCString();
 }
 
 
@@ -377,7 +384,7 @@ void CCTextureAtlas::insertQuadFromIndex(unsigned int oldIndex, unsigned int new
     {
         return;
     }
-    // because it is ambigious in iphone, so we implement abs ourself
+    // because it is ambiguous in iphone, so we implement abs ourselves
     // unsigned int howMany = abs( oldIndex - newIndex);
     unsigned int howMany = (oldIndex - newIndex) > 0 ? (oldIndex - newIndex) :  (newIndex - oldIndex);
     unsigned int dst = oldIndex;

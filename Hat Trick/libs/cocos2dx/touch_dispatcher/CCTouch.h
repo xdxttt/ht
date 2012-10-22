@@ -25,21 +25,46 @@ THE SOFTWARE.
 #ifndef __CC_TOUCH_H__
 #define __CC_TOUCH_H__
 
-#include "CCObject.h"
-#include "CCGeometry.h"
+#include "cocoa/CCObject.h"
+#include "cocoa/CCGeometry.h"
 
 NS_CC_BEGIN
 
-class CCTouch : public CCObject
+/**
+ * @addtogroup input
+ * @{
+ */
+
+class CC_DLL CCTouch : public CCObject
 {
 public:
     CCTouch() 
         : m_nId(0)
     {}
 
-    CCPoint locationInView() { return m_point; }
-    CCPoint previousLocationInView() { return m_prevPoint; }
+    /** returns the current touch location in OpenGL coordinates */
+    CCPoint getLocation() const;
+    /** returns the previous touch location in OpenGL coordinates */
+    CCPoint getPreviousLocation() const;
+    /** returns the current touch location in screen coordinates */
+    CCPoint getDelta() const;
+    /** returns the current touch location in screen coordinates */
+    CCPoint getLocationInView() const;
+    /** returns the previous touch location in screen coordinates */
+    CCPoint getPreviousLocationInView() const;
 
+    /** returns the current touch location in screen coordinates
+     @deprecated: use CCTouch::getLocationInView() instead. 
+     CCTouch::getLocation() is recommended, it will return OpenGL coordinate.
+    */
+    CC_DEPRECATED_ATTRIBUTE CCPoint locationInView()  { return m_point; }
+    
+    /** returns the current previous location in screen coordinates
+     @deprecated: use CCTouch::getPreviousLocationInView() instead. 
+     CCTouch::getPreviousLocation() is recommended, it will return OpenGL coordinate.
+     */
+    CC_DEPRECATED_ATTRIBUTE CCPoint previousLocationInView() { return m_prevPoint; }
+    
     void setTouchInfo(int id, float x, float y)
     {
         m_nId = id;
@@ -59,9 +84,12 @@ private:
     CCPoint m_prevPoint;
 };
 
-class CCEvent : public CCObject
+class CC_DLL CCEvent : public CCObject
 {
 };
+
+// end of input group
+/// @}
 
 NS_CC_END
 

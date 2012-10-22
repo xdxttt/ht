@@ -29,6 +29,11 @@ THE SOFTWARE.
 
 NS_CC_BEGIN
 
+/**
+ * @addtogroup platform
+ * @{
+ */
+
 /// The max length of CCLog message.
 static const int kMaxLogLen = 16*1024;
 
@@ -42,14 +47,13 @@ void CC_DLL CCLog(const char * pszFormat, ...);
  */
 void CC_DLL CCLuaLog(const char * pszFormat);
 
-
 /**
 @brief Pop out a message box
 */
 void CC_DLL CCMessageBox(const char * pszMsg, const char * pszTitle);
 
 /**
-@brief Enum the language type supportted now
+@brief Enum the language type supported now
 */
 typedef enum LanguageType
 {
@@ -61,6 +65,9 @@ typedef enum LanguageType
     kLanguageSpanish,
     kLanguageRussian
 } ccLanguageType;
+
+// end of platform group
+/// @}
 
 NS_CC_END
 

@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2009-2010 Ricardo Quesada
 Copyright (c) 2011      Zynga Inc.
 
@@ -25,7 +25,8 @@ THE SOFTWARE.
 ****************************************************************************/
 #ifndef __CCTMX_TILE_MAP_H__
 #define __CCTMX_TILE_MAP_H__
-#include "CCNode.h"
+
+#include "base_nodes/CCNode.h"
 #include "CCTMXObjectGroup.h"
 
 NS_CC_BEGIN
@@ -36,7 +37,12 @@ class CCTMXLayerInfo;
 class CCTMXTilesetInfo;
 class CCTMXMapInfo;
 
-/** Possible oritentations of the TMX map */
+/**
+ * @addtogroup tilemap_parallax_nodes
+ * @{
+ */
+
+/** Possible orientations of the TMX map */
 enum
 {
     /** Orthogonal orientation */
@@ -58,7 +64,7 @@ It also supports object groups, objects, and properties.
 Features:
 - Each tile will be treated as an CCSprite
 - The sprites are created on demand. They will be created only when you call "layer->tileAt(position)"
-- Each tile can be rotated / moved / scaled / tinted / "opacitied", since each tile is a CCSprite
+- Each tile can be rotated / moved / scaled / tinted / "opaqued", since each tile is a CCSprite
 - Tiles can be added/removed in runtime
 - The z-order of the tiles can be modified in runtime
 - Each tile has an anchorPoint of (0,0)
@@ -74,7 +80,7 @@ Features:
 
 Limitations:
 - It only supports one tileset per layer.
-- Embeded images are not supported
+- Embedded images are not supported
 - It only supports the XML format (the JSON format is not supported)
 
 Technical description:
@@ -116,11 +122,21 @@ public:
     CCTMXTiledMap();
     virtual ~CCTMXTiledMap();
 
+    /** creates a TMX Tiled Map with a TMX file.
+    @deprecated: This interface will be deprecated sooner or later.
+    */
+    CC_DEPRECATED_ATTRIBUTE static CCTMXTiledMap* tiledMapWithTMXFile(const char *tmxFile);
+
+    /** initializes a TMX Tiled Map with a TMX formatted XML string and a path to TMX resources 
+    @deprecated: This interface will be deprecated sooner or later.
+    */
+    CC_DEPRECATED_ATTRIBUTE static CCTMXTiledMap* tiledMapWithXML(const char* tmxString, const char* resourcePath);
+
     /** creates a TMX Tiled Map with a TMX file.*/
-    static CCTMXTiledMap* tiledMapWithTMXFile(const char *tmxFile);
+    static CCTMXTiledMap* create(const char *tmxFile);
 
     /** initializes a TMX Tiled Map with a TMX formatted XML string and a path to TMX resources */
-    static CCTMXTiledMap* tiledMapWithXML(const char* tmxString, const char* resourcePath);
+    static CCTMXTiledMap* createWithXML(const char* tmxString, const char* resourcePath);
 
     /** initializes a TMX Tiled Map with a TMX file */
     bool initWithTMXFile(const char *tmxFile);
@@ -131,7 +147,7 @@ public:
     /** return the TMXLayer for the specific layer */
     CCTMXLayer* layerNamed(const char *layerName);
 
-    /** return the TMXObjectGroup for the secific group */
+    /** return the TMXObjectGroup for the specific group */
     CCTMXObjectGroup* objectGroupNamed(const char *groupName);
 
     /** return the value for the specific property name */
@@ -149,6 +165,9 @@ protected:
     CCDictionary* m_pTileProperties;
 
 };
+
+// end of tilemap_parallax_nodes group
+/// @}
 
 NS_CC_END
 

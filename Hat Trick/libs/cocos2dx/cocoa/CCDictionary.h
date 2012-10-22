@@ -34,6 +34,11 @@ NS_CC_BEGIN
 
 class CCDictionary;
 
+/**
+ * @addtogroup data_structures
+ * @{
+ */
+
 class CC_DLL CCDictElement
 {
     #define MAX_KEY_LEN  256
@@ -55,7 +60,7 @@ public:
         strcpy(m_szKey, pStart);
     }
 
-    CCDictElement(int iKey, CCObject* pObject)
+    CCDictElement(intptr_t iKey, CCObject* pObject)
     {
         init();
         m_iKey = iKey;
@@ -68,7 +73,7 @@ public:
         return m_szKey;
     }
 
-    inline int getIntKey() const 
+    inline intptr_t getIntKey() const 
     {
         CCAssert(m_szKey[0] == '\0', "Should not call this function for string dictionary");
         return m_iKey;
@@ -90,7 +95,7 @@ private:
 
 private:
     char m_szKey[MAX_KEY_LEN+1];  /** hash key of string type*/
-    int  m_iKey;        /** hash key of integer type */
+    intptr_t  m_iKey;   /** hash key of integer type */
     CCObject* m_pObject;/** hash value */
 public:
     UT_hash_handle hh; /* makes this class hashable */
@@ -136,21 +141,42 @@ public:
     virtual CCObject* copyWithZone(CCZone* pZone);
 
     /* static functions */
-    static CCDictionary* dictionary();
+    //@deprecated: Please use create() instead. This interface will be deprecated sooner or later.
+    CC_DEPRECATED_ATTRIBUTE static CCDictionary* dictionary();
 
-    static CCDictionary* dictionaryWithDictionary(CCDictionary* srcDict);
+    //@deprecated: Please use createWithDictionary(CCDictionary*) instead. This interface will be deprecated sooner or later.
+    CC_DEPRECATED_ATTRIBUTE static CCDictionary* dictionaryWithDictionary(CCDictionary* srcDict);
+    
+    /**
+    @brief   Generate a CCDictionary pointer by file
+    @param   pFileName  The file name of *.plist file
+    @return  The CCDictionary pointer generated from the file
+    @deprecated: Please use createWithContentsOfFile(const char*) instead. This interface will be deprecated sooner or later.
+    */
+    CC_DEPRECATED_ATTRIBUTE static CCDictionary* dictionaryWithContentsOfFile(const char *pFileName);
+
+    /*
+    @brief The same meaning as dictionaryWithContentsOfFile(), but it doesn't call autorelease, so the
+           invoker should call release().
+    @deprecated: Please use createWithContentsOfFileThreadSafe(const char*) instead. This interface will be deprecated sooner or later.
+    */
+    CC_DEPRECATED_ATTRIBUTE static CCDictionary* dictionaryWithContentsOfFileThreadSafe(const char *pFileName);
+
+    static CCDictionary* create();
+
+    static CCDictionary* createWithDictionary(CCDictionary* srcDict);
     /**
     @brief   Generate a CCDictionary pointer by file
     @param   pFileName  The file name of *.plist file
     @return  The CCDictionary pointer generated from the file
     */
-    static CCDictionary* dictionaryWithContentsOfFile(const char *pFileName);
+    static CCDictionary* createWithContentsOfFile(const char *pFileName);
 
     /*
     @brief The same meaning as dictionaryWithContentsOfFile(), but it doesn't call autorelease, so the
            invoker should call release().
     */
-    static CCDictionary* dictionaryWithContentsOfFileThreadSafe(const char *pFileName);
+    static CCDictionary* createWithContentsOfFileThreadSafe(const char *pFileName);
 
 private:
     void setObjectUnSafe(CCObject* pObject, const std::string& key);
@@ -169,6 +195,9 @@ private:
     CCDictType m_eDictType;
     CCDictType m_eOldDictType;
 };
+
+// end of data_structure group
+/// @}
 
 NS_CC_END
 

@@ -7,8 +7,8 @@ using namespace CocosDenshion;
 CCScene* Tutorial::scene()
 {
 	// 'scene' is an autorelease object
-	CCScene *scene = CCScene::node();
-    Tutorial *layer = Tutorial::node();
+	CCScene *scene = CCScene::create();
+    Tutorial *layer = Tutorial::create();
 	scene->addChild(layer);
 	return scene;
 }
@@ -26,15 +26,15 @@ bool Tutorial::init()
     double scale_height = height/640;
     
     
-    t1 = CCSprite::spriteWithFile("step1.png");
+    t1 = CCSprite::create("step1.png");
     t1->setPosition(ccp(CCDirector::sharedDirector()->getWinSize().width/2, CCDirector::sharedDirector()->getWinSize().height/2) );
-    t2 = CCSprite::spriteWithFile("step2.png");
+    t2 = CCSprite::create("step2.png");
     t2->setPosition(ccp(CCDirector::sharedDirector()->getWinSize().width/2, CCDirector::sharedDirector()->getWinSize().height/2) );
-    t3 = CCSprite::spriteWithFile("step3.png");
+    t3 = CCSprite::create("step3.png");
     t3->setPosition(ccp(CCDirector::sharedDirector()->getWinSize().width/2, CCDirector::sharedDirector()->getWinSize().height/2) );
-    t4 = CCSprite::spriteWithFile("step4.png");
+    t4 = CCSprite::create("step4.png");
     t4->setPosition(ccp(CCDirector::sharedDirector()->getWinSize().width/2, CCDirector::sharedDirector()->getWinSize().height/2) );
-    bg = CCSprite::spriteWithFile("bg.png");
+    bg = CCSprite::create("bg.png");
     bg->setPosition(ccp(CCDirector::sharedDirector()->getWinSize().width/2, CCDirector::sharedDirector()->getWinSize().height/2) );
 
     this->addChild(bg, 1);
@@ -56,27 +56,27 @@ bool Tutorial::init()
     t4->setScaleY(scale_height); 
     bg->setScaleY(scale_height);
     
-    this->setIsTouchEnabled(true);
+    this->setTouchEnabled(true);
     
     
     width = CCDirector::sharedDirector()->getWinSize().width;
     height = CCDirector::sharedDirector()->getWinSize().height;
     
     float scale = width/960.0;
-	pNext = CCMenuItemImage::itemWithNormalImage("next.png","next_2.png",this,menu_selector(Tutorial::nextSetp));
-    pStart = CCMenuItemImage::itemWithNormalImage("start.png","start_2.png",this,menu_selector(Tutorial::nextSetp));
-    pPrevious = CCMenuItemImage::itemWithNormalImage("previous.png","previous_2.png",this,menu_selector(Tutorial::previousSetp));
+	pNext = CCMenuItemImage::create("next.png","next_2.png",this,menu_selector(Tutorial::nextSetp));
+    pStart = CCMenuItemImage::create("start.png","start_2.png",this,menu_selector(Tutorial::nextSetp));
+    pPrevious = CCMenuItemImage::create("previous.png","previous_2.png",this,menu_selector(Tutorial::previousSetp));
 	pNext->setPosition( ccp(width - width*0.1, height*0.1) );
     pNext->setScale(scale);
     pStart->setPosition( ccp(width - width*0.1, height*0.1) );
     pStart->setScale(scale);
-    pStart->setIsVisible(false);
+    pStart->setVisible(false);
     
 	pPrevious->setPosition( ccp(width*0.1,height*0.1) );
     pPrevious->setScale(scale);
-    pPrevious->setIsVisible(false);
+    pPrevious->setVisible(false);
 	// create menu, it's an autorelease object
-	CCMenu* pMainMenu = CCMenu::menuWithItems(pNext,pStart,pPrevious, NULL);
+	CCMenu* pMainMenu = CCMenu::create(pNext,pStart,pPrevious, NULL);
 	pMainMenu->setPosition( CCPointZero );
 	this->addChild(pMainMenu, 6);
     
@@ -87,47 +87,47 @@ void Tutorial::ccTouchesEnded(cocos2d::CCSet *pTouches, cocos2d::CCEvent *pEvent
      
 }
 void Tutorial::nextSetp(){
-    if (t1->getIsVisible()) {
-        t1->setIsVisible(false);
-        pPrevious->setIsVisible(true);
-    }else if(t2->getIsVisible()){
-        t2->setIsVisible(false);
-    }else if(t3->getIsVisible()){
-        t3->setIsVisible(false);
-        pNext->setIsVisible(false);
-        pStart->setIsVisible(true);
-    }else if(t4->getIsVisible()){
-        t4->setIsVisible(false);
+    if (t1->isVisible()) {
+        t1->setVisible(false);
+        pPrevious->setVisible(true);
+    }else if(t2->isVisible()){
+        t2->setVisible(false);
+    }else if(t3->isVisible()){
+        t3->setVisible(false);
+        pNext->setVisible(false);
+        pStart->setVisible(true);
+    }else if(t4->isVisible()){
+        t4->setVisible(false);
         CCUserDefault *save=CCUserDefault::sharedUserDefault(); 
         save->setBoolForKey("tutorialed",true); 
         save->flush();
         CCScene* pPlay = Play::scene();
-        CCTransitionFade *pTranScene = CCTransitionFade::transitionWithDuration(0.5, pPlay);
+        CCTransitionFade *pTranScene = CCTransitionFade::create(0.5, pPlay);
         CCDirector::sharedDirector()->pushScene(pTranScene);
       
-        t1->setIsVisible(true);
-        t2->setIsVisible(true);
-        t3->setIsVisible(true);
-        t4->setIsVisible(true);
-        pPrevious->setIsVisible(false);
-        pNext->setIsVisible(true);
-        pStart->setIsVisible(false);
+        t1->setVisible(true);
+        t2->setVisible(true);
+        t3->setVisible(true);
+        t4->setVisible(true);
+        pPrevious->setVisible(false);
+        pNext->setVisible(true);
+        pStart->setVisible(false);
     }
 }
 
 
 void Tutorial::previousSetp(){
-    if (t1->getIsVisible()) {
+    if (t1->isVisible()) {
         
-    }else if(t2->getIsVisible()){
-        t1->setIsVisible(true);
-        pPrevious->setIsVisible(false);
-    }else if(t3->getIsVisible()){
-        t2->setIsVisible(true);
-    }else if(t4->getIsVisible()){
-        t3->setIsVisible(true);
-        pNext->setIsVisible(true);
-        pStart->setIsVisible(false);
+    }else if(t2->isVisible()){
+        t1->setVisible(true);
+        pPrevious->setVisible(false);
+    }else if(t3->isVisible()){
+        t2->setVisible(true);
+    }else if(t4->isVisible()){
+        t3->setVisible(true);
+        pNext->setVisible(true);
+        pStart->setVisible(false);
     }
 }
 

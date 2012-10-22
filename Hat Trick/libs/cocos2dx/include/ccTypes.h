@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2008-2010 Ricardo Quesada
 Copyright (c) 2011      Zynga Inc.
 
@@ -27,7 +27,7 @@ THE SOFTWARE.
 #ifndef __CCTYPES_H__
 #define __CCTYPES_H__
 
-#include "CCGeometry.h"
+#include "cocoa/CCGeometry.h"
 #include "CCGL.h"
 
 NS_CC_BEGIN
@@ -254,7 +254,7 @@ typedef struct _ccV3F_C4B_T2F
 //    char __padding2__[4];
 
     // tex coords (2F)
-    ccTex2F            texCoords;            // 8 byts
+    ccTex2F            texCoords;            // 8 bytes
 } ccV3F_C4B_T2F;
 
 //! 4 ccVertex2FTex2FColor4B Quad
@@ -305,32 +305,22 @@ typedef struct _ccBlendFunc
     GLenum dst;
 } ccBlendFunc;
 
-//! ccResolutionType
+// XXX: If any of these enums are edited and/or reordered, update CCTexture2D.m
+//! Vertical text alignment type
 typedef enum
 {
-    //! Unknonw resolution type
-    kCCResolutionUnknown,
-    //! iPhone resolution type
-    kCCResolutioniPhone,
-    //! RetinaDisplay resolution type
-    kCCResolutioniPhoneRetinaDisplay,
-    //! iPad resolution type
-    kCCResolutioniPad,
-    //! iPad Retina Display resolution type
-    kCCResolutioniPadRetinaDisplay,
-    
-} ccResolutionType;
+    kCCVerticalTextAlignmentTop,
+    kCCVerticalTextAlignmentCenter,
+    kCCVerticalTextAlignmentBottom,
+} CCVerticalTextAlignment;
 
-//! delta time type
-//! if you want more resolution redefine it as a double
-typedef float ccTime;
-//typedef double ccTime;
-
-typedef enum 
+// XXX: If any of these enums are edited and/or reordered, update CCTexture2D.m
+//! Horizontal text alignment type
+typedef enum
 {
-    CCTextAlignmentLeft,
-    CCTextAlignmentCenter,
-    CCTextAlignmentRight,
+    kCCTextAlignmentLeft,
+    kCCTextAlignmentCenter,
+    kCCTextAlignmentRight,
 } CCTextAlignment;
 
 // types for animation in particle systems
@@ -352,7 +342,7 @@ typedef struct _ccT2F_Quad
 typedef struct
 {
     ccT2F_Quad texCoords;
-    ccTime delay;
+    float delay;
     CCSize size; 
 } ccAnimationFrameData;
 

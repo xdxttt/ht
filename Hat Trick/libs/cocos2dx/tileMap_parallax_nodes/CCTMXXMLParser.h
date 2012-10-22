@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2009-2010 Ricardo Quesada
 Copyright (c) 2011      Zynga Inc.
 
@@ -27,17 +27,16 @@ THE SOFTWARE.
 
 #ifndef __CC_TM_XML_PARSER__
 #define __CC_TM_XML_PARSER__
-#include "CCArray.h"
-#include "CCDictionary.h"
-#include "CCGeometry.h"
 
-#include "../platform/CCSAXParser.h"
+#include "cocoa/CCArray.h"
+#include "cocoa/CCDictionary.h"
+#include "cocoa/CCGeometry.h"
+#include "platform/CCSAXParser.h"
 
 #include <string>
 
 NS_CC_BEGIN
 
-class CCData;
 class CCTMXObjectGroup;
 
 /** @file
@@ -47,6 +46,11 @@ class CCTMXObjectGroup;
 * since the user should not use them.
 *
 */
+
+/**
+ * @addtogroup tilemap_parallax_nodes
+ * @{
+ */
 
 enum {
     TMXLayerAttribNone = 1 << 0,
@@ -102,7 +106,7 @@ public:
 
 /** @brief CCTMXTilesetInfo contains the information about the tilesets like:
 - Tileset name
-- Tilset spacing
+- Tileset spacing
 - Tileset margin
 - size of the tiles
 - Image used for the tiles
@@ -162,7 +166,7 @@ public:
     CC_SYNTHESIZE(unsigned int, m_uParentGID, ParentGID);
     /// layer attribs
     CC_SYNTHESIZE(int, m_nLayerAttribs, LayerAttribs);
-    /// is stroing characters?
+    /// is storing characters?
     CC_SYNTHESIZE(bool, m_bStoringCharacters, StoringCharacters);
     /// properties
     CC_PROPERTY(CCDictionary*, m_pProperties, Properties);
@@ -173,16 +177,14 @@ public:
     static CCTMXMapInfo * formatWithTMXFile(const char *tmxFile);
     /** creates a TMX Format with an XML string and a TMX resource path */
     static CCTMXMapInfo * formatWithXML(const char* tmxString, const char* resourcePath);
-    /** initializes a TMX format witha  tmx file */
+    /** initializes a TMX format with a  tmx file */
     bool initWithTMXFile(const char *tmxFile);
     /** initializes a TMX format with an XML string and a TMX resource path */
     bool initWithXML(const char* tmxString, const char* resourcePath);
-    /** initalises parsing of an XML file, either a tmx (Map) file or tsx (Tileset) file */
+    /** initializes parsing of an XML file, either a tmx (Map) file or tsx (Tileset) file */
     bool parseXMLFile(const char *xmlFilename);
-    /* initalises parsing of an XML string, either a tmx (Map) string or tsx (Tileset) string */
+    /* initializes parsing of an XML string, either a tmx (Map) string or tsx (Tileset) string */
     bool parseXMLString(const char *xmlString);
-    /* handles the work of parsing for parseXMLFile: and parseXMLString: */
-    bool parseXMLData(const CCData* data);
 
     CCDictionary* getTileProperties();
     void setTileProperties(CCDictionary* tileProperties);
@@ -208,6 +210,9 @@ protected:
     //! tile properties
     CCDictionary* m_pTileProperties;
 };
+
+// end of tilemap_parallax_nodes group
+/// @}
 
 NS_CC_END
 

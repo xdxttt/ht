@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2008-2010 Ricardo Quesada
 Copyright (c) 2011      Zynga Inc.
 
@@ -27,14 +27,14 @@ THE SOFTWARE.
 #ifndef __CCTEXTURE_CACHE_H__
 #define __CCTEXTURE_CACHE_H__
 
+#include "cocoa/CCObject.h"
+#include "cocoa/CCDictionary.h"
+#include "textures/CCTexture2D.h"
 #include <string>
-#include "CCObject.h"
-#include "CCDictionary.h"
-#include "CCTexture2D.h"
 
 
-#if CC_ENABLE_CACHE_TEXTTURE_DATA
-    #include "CCImage.h"
+#if CC_ENABLE_CACHE_TEXTURE_DATA
+    #include "platform/CCImage.h"
     #include <list>
 #endif
 
@@ -42,6 +42,11 @@ NS_CC_BEGIN
 
 class CCLock;
 class CCImage;
+
+/**
+ * @addtogroup textures
+ * @{
+ */
 
 /** @brief Singleton that handles the loading of textures
 * Once the texture is loaded, the next time it will return
@@ -55,8 +60,8 @@ protected:
 
 
 private:
-    // @todo void addImageWithAsyncObject(CCAsyncObject* async);
-    void addImageAsyncCallBack(ccTime dt);
+    /// todo: void addImageWithAsyncObject(CCAsyncObject* async);
+    void addImageAsyncCallBack(float dt);
 
 public:
 
@@ -67,7 +72,7 @@ public:
 
     CCDictionary* snapshotTextures();
 
-    /** Retruns ths shared instance of the cache */
+    /** Returns the shared instance of the cache */
     static CCTextureCache * sharedTextureCache();
 
     /** purges the cache. It releases the retained instance.
@@ -78,7 +83,7 @@ public:
     /** Returns a Texture2D object given an file image
     * If the file image was not previously loaded, it will create a new CCTexture2D
     *  object and it will return it. It will use the filename as a key.
-    * Otherwise it will return a reference of a previosly loaded image.
+    * Otherwise it will return a reference of a previously loaded image.
     * Supported image extensions: .png, .bmp, .tiff, .jpeg, .pvr, .gif
     */
     CCTexture2D* addImage(const char* fileimage);
@@ -100,7 +105,7 @@ public:
     * If "key" is nil, then a new texture will be created each time.
     * @since v0.8
     */
-    // @todo CGImageRef CCTexture2D* addCGImage(CGImageRef image, string &  key);
+    // todo: CGImageRef CCTexture2D* addCGImage(CGImageRef image, string &  key);
     /** Returns a Texture2D object given an UIImage image
     * If the image was not previously loaded, it will create a new CCTexture2D object and it will return it.
     * Otherwise it will return a reference of a previously loaded image
@@ -123,7 +128,7 @@ public:
 
     /** Removes unused textures
     * Textures that have a retain count of 1 will be deleted
-    * It is convinient to call this method after when starting a new Scene
+    * It is convenient to call this method after when starting a new Scene
     * @since v0.8
     */
     void removeUnusedTextures();
@@ -147,7 +152,7 @@ public:
 #ifdef CC_SUPPORT_PVRTC
     /** Returns a Texture2D object given an PVRTC RAW filename
     * If the file image was not previously loaded, it will create a new CCTexture2D
-    *  object and it will return it. Otherwise it will return a reference of a previosly loaded image
+    *  object and it will return it. Otherwise it will return a reference of a previously loaded image
     *
     * It can only load square images: width == height, and it must be a power of 2 (128,256,512...)
     * bpp can only be 2 or 4. 2 means more compression but lower quality.
@@ -158,17 +163,17 @@ public:
     
     /** Returns a Texture2D object given an PVR filename
     * If the file image was not previously loaded, it will create a new CCTexture2D
-    *  object and it will return it. Otherwise it will return a reference of a previosly loaded image
+    *  object and it will return it. Otherwise it will return a reference of a previously loaded image
     */
     CCTexture2D* addPVRImage(const char* filename);
 
     /** Reload all textures
-    It's only useful when the value of CC_ENABLE_CACHE_TEXTTURE_DATA is 1
+    It's only useful when the value of CC_ENABLE_CACHE_TEXTURE_DATA is 1
     */
     static void reloadAllTextures();
 };
 
-#if CC_ENABLE_CACHE_TEXTTURE_DATA
+#if CC_ENABLE_CACHE_TEXTURE_DATA
 
 class VolatileTexture
 {
@@ -185,10 +190,12 @@ public:
     ~VolatileTexture();
 
     static void addImageTexture(CCTexture2D *tt, const char* imageFileName, CCImage::EImageFormat format);
-    static void addStringTexture(CCTexture2D *tt, const char* text, const CCSize& dimensions, CCTextAlignment alignment, const char *fontName, float fontSize);
+    static void addStringTexture(CCTexture2D *tt, const char* text, const CCSize& dimensions, CCTextAlignment alignment, 
+                                 CCVerticalTextAlignment vAlignment, const char *fontName, float fontSize);
     static void addDataTexture(CCTexture2D *tt, void* data, CCTexture2DPixelFormat pixelFormat, const CCSize& contentSize);
     static void addCCImage(CCTexture2D *tt, CCImage *image);
 
+    static void setTexParameters(CCTexture2D *t, ccTexParams *texParams);
     static void removeTexture(CCTexture2D *t);
     static void reloadAllTextures();
 
@@ -215,14 +222,19 @@ protected:
     std::string m_strFileName;
     CCImage::EImageFormat m_FmtImage;
 
+    ccTexParams     m_texParams;
     CCSize          m_size;
     CCTextAlignment m_alignment;
+    CCVerticalTextAlignment m_vAlignment;
     std::string     m_strFontName;
     std::string     m_strText;
     float           m_fFontSize;
 };
 
 #endif
+
+// end of textures group
+/// @}
 
 NS_CC_END
 

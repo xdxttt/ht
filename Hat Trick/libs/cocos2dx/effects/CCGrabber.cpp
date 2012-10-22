@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2009      On-Core
  
 http://www.cocos2d-x.org
@@ -24,7 +24,7 @@ THE SOFTWARE.
 ****************************************************************************/
 #include "CCGrabber.h"
 #include "ccMacros.h"
-#include "CCTexture2D.h"
+#include "textures/CCTexture2D.h"
 #include "platform/platform.h"
 
 NS_CC_BEGIN
@@ -53,7 +53,7 @@ void CCGrabber::grab(CCTexture2D *pTexture)
     GLuint status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (status != GL_FRAMEBUFFER_COMPLETE)
     {
-        CCAssert(0, "Frame Grabber: could not attach texture to frmaebuffer");
+        CCAssert(0, "Frame Grabber: could not attach texture to framebuffer");
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_oldFBO);
@@ -70,15 +70,15 @@ void CCGrabber::beforeRender(CCTexture2D *pTexture)
     glGetFloatv(GL_COLOR_CLEAR_VALUE, m_oldClearColor);
     // BUG XXX: doesn't work with RGB565.
 
-    /*glClearColor(0, 0, 0, 0);*/
+    glClearColor(0, 0, 0, 0);
 
     // BUG #631: To fix #631, uncomment the lines with #631
     // Warning: But it CCGrabber won't work with 2 effects at the same time
-    glClearColor(0.0f,0.0f,0.0f,1.0f);    // #631
+//  glClearColor(0.0f,0.0f,0.0f,1.0f);    // #631
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glColorMask(true, true, true, false);    // #631
+//  glColorMask(true, true, true, false);    // #631
 }
 
 void CCGrabber::afterRender(cocos2d::CCTexture2D *pTexture)
@@ -86,9 +86,10 @@ void CCGrabber::afterRender(cocos2d::CCTexture2D *pTexture)
     CC_UNUSED_PARAM(pTexture);
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_oldFBO);
-    glColorMask(true, true, true, true);    // #631
+//  glColorMask(true, true, true, true);    // #631
+    
     // Restore clear color
-    glClearColor( m_oldClearColor[0], m_oldClearColor[1], m_oldClearColor[2], m_oldClearColor[3] );
+    glClearColor(m_oldClearColor[0], m_oldClearColor[1], m_oldClearColor[2], m_oldClearColor[3]);
 }
 
 CCGrabber::~CCGrabber()

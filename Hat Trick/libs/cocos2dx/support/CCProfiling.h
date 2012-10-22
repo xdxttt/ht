@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2010      Stuart Carnie
 
 http://www.cocos2d-x.org
@@ -26,12 +26,17 @@ THE SOFTWARE.
 #define __SUPPORT_CCPROFILING_H__
 
 #include "ccConfig.h"
-#include <string>
-#include "CCObject.h"
+#include "cocoa/CCObject.h"
 #include "platform/platform.h"
-#include "CCDictionary.h"
+#include "cocoa/CCDictionary.h"
+#include <string>
 
 NS_CC_BEGIN
+
+/**
+ * @addtogroup global
+ * @{
+ */
 
 class CCProfilingTimer;
 
@@ -94,6 +99,9 @@ extern void CCProfilingResetTimingBlock(const char *timerName);
 extern bool kCCProfilerCategorySprite;
 extern bool kCCProfilerCategoryBatchSprite;
 extern bool kCCProfilerCategoryParticles;
+
+// end of global group
+/// @}
 
 NS_CC_END
 

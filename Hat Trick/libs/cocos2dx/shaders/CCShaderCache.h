@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2011      Ricardo Quesada
 Copyright (c) 2011      Zynga Inc.
 
@@ -27,11 +27,16 @@ THE SOFTWARE.
 #ifndef __CCSHADERCACHE_H__
 #define __CCSHADERCACHE_H__
 
-#include "CCDictionary.h"
+#include "cocoa/CCDictionary.h"
 
 NS_CC_BEGIN
 
 class CCGLProgram;
+
+/**
+ * @addtogroup shaders
+ * @{
+ */
 
 /** CCShaderCache
  Singleton that stores manages GL shaders
@@ -68,6 +73,9 @@ private:
     CCDictionary* m_pPrograms;
 
 };
+
+// end of shaders group
+/// @}
 
 NS_CC_END
 

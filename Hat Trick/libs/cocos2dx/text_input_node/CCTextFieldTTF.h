@@ -25,19 +25,24 @@ THE SOFTWARE.
 #ifndef __CC_TEXT_FIELD_H__
 #define __CC_TEXT_FIELD_H__
 
-#include "CCLabelTTF.h"
-#include "CCIMEDelegate.h"
-#include "CCTouchDelegateProtocol.h"
+#include "label_nodes/CCLabelTTF.h"
+#include "text_input_node/CCIMEDelegate.h"
+#include "touch_dispatcher/CCTouchDelegateProtocol.h"
 
 NS_CC_BEGIN
 
 class CCTextFieldTTF;
 
+/**
+ * @addtogroup input
+ * @{
+ */
+
 class CC_DLL CCTextFieldDelegate
 {
 public:
     /**
-    @brief    If the sender doesn't want to attach with IME, return true;
+    @brief    If the sender doesn't want to attach to the IME, return true;
     */
     virtual bool onTextFieldAttachWithIME(CCTextFieldTTF * sender)
     { 
@@ -46,7 +51,7 @@ public:
     }
 
     /**
-    @brief    If the sender doesn't want to detach with IME, return true;
+    @brief    If the sender doesn't want to detach from the IME, return true;
     */
     virtual bool onTextFieldDetachWithIME(CCTextFieldTTF * sender)
     {
@@ -77,7 +82,7 @@ public:
     }
 
     /**
-    @brief    If doesn't want draw sender as default, return true.
+    @brief    If the sender doesn't want to draw, return true.
     */
     virtual bool onDraw(CCTextFieldTTF * sender)
     {
@@ -112,7 +117,7 @@ public:
     virtual bool attachWithIME();
 
     /**
-    @brief    End text input  and close keyboard.
+    @brief    End text input and close keyboard.
     */
     virtual bool detachWithIME();
 
@@ -155,6 +160,9 @@ private:
     class LengthStack;
     LengthStack * m_pLens;
 };
+
+// end of input group
+/// @}
 
 NS_CC_END
 

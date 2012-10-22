@@ -25,7 +25,7 @@ THE SOFTWARE.
 #ifndef __CC_STD_C_H__
 #define __CC_STD_C_H__
 
-#include "CCPlatformMacros.h"
+#include "platform/CCPlatformMacros.h"
 #include <float.h>
 #include <math.h>
 #include <string.h>
@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include <stdlib.h>
 #include <time.h>
 #include <sys/time.h>
+#include <stdint.h>
 
 #ifndef MIN
 #define MIN(x,y) (((x) > (y)) ? (y) : (x))

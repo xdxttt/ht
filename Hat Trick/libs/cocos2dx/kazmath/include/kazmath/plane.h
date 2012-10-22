@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define KM_PLANE_NEAR 4
 #define KM_PLANE_FAR 5
 
-#include "CCPlatformMacros.h"
+#include "platform/CCPlatformMacros.h"
 #include "utility.h"
 
 struct kmVec3;
@@ -62,7 +62,7 @@ CC_DLL kmPlane* const kmPlaneFromPoints(kmPlane* pOut, const struct kmVec3* p1, 
 CC_DLL kmVec3*  const kmPlaneIntersectLine(struct kmVec3* pOut, const kmPlane* pP, const struct kmVec3* pV1, const struct kmVec3* pV2);
 CC_DLL kmPlane* const kmPlaneNormalize(kmPlane* pOut, const kmPlane* pP);
 CC_DLL kmPlane* const kmPlaneScale(kmPlane* pOut, const kmPlane* pP, kmScalar s);
-CC_DLL const POINT_CLASSIFICATION kmPlaneClassifyPoint(const kmPlane* pIn, const kmVec3* pP); /** Classifys a point against a plane */
+CC_DLL const POINT_CLASSIFICATION kmPlaneClassifyPoint(const kmPlane* pIn, const kmVec3* pP); /** Classifies a point against a plane */
 
 #ifdef __cplusplus
 }

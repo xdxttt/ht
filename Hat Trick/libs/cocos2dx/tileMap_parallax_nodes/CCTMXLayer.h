@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2009-2010 Ricardo Quesada
 Copyright (c) 2011      Zynga Inc.
 
@@ -27,8 +27,8 @@ THE SOFTWARE.
 #define __CCTMX_LAYER_H__
 
 #include "CCTMXObjectGroup.h"
-#include "CCAtlasNode.h"
-#include "CCSpriteBatchNode.h"
+#include "base_nodes/CCAtlasNode.h"
+#include "sprite_nodes/CCSpriteBatchNode.h"
 #include "CCTMXXMLParser.h"
 NS_CC_BEGIN
 
@@ -36,6 +36,11 @@ class CCTMXMapInfo;
 class CCTMXLayerInfo;
 class CCTMXTilesetInfo;
 struct _ccCArray;
+
+/**
+ * @addtogroup tilemap_parallax_nodes
+ * @{
+ */
 
 /** @brief CCTMXLayer represents the TMX layer.
 
@@ -48,12 +53,12 @@ If the layer contains a property named "cc_vertexz" with an integer (in can be p
 then all the tiles belonging to the layer will use that value as their OpenGL vertex Z for depth.
 
 On the other hand, if the "cc_vertexz" property has the "automatic" value, then the tiles will use an automatic vertex Z value.
-Also before drawing the tiles, GL_ALPHA_TEST will be enabled, and disabled after drawin them. The used alpha func will be:
+Also before drawing the tiles, GL_ALPHA_TEST will be enabled, and disabled after drawing them. The used alpha func will be:
 
 glAlphaFunc( GL_GREATER, value )
 
 "value" by default is 0, but you can change it from Tiled by adding the "cc_alpha_func" property to the layer.
-The value 0 should work for most cases, but if you have tiles that are semi-transparent, then you might want to use a differnt
+The value 0 should work for most cases, but if you have tiles that are semi-transparent, then you might want to use a different
 value, like 0.5.
 
 For further information, please see the programming guide:
@@ -70,11 +75,11 @@ class CC_DLL CCTMXLayer : public CCSpriteBatchNode
 {
     /** size of the layer in tiles */
     CC_SYNTHESIZE_PASS_BY_REF(CCSize, m_tLayerSize, LayerSize);
-    /** size of the map's tile (could be differnt from the tile's size) */
+    /** size of the map's tile (could be different from the tile's size) */
     CC_SYNTHESIZE_PASS_BY_REF(CCSize, m_tMapTileSize, MapTileSize);
     /** pointer to the map of tiles */
     CC_SYNTHESIZE(unsigned int*, m_pTiles, Tiles);
-    /** Tilset information for the layer */
+    /** Tileset information for the layer */
     CC_PROPERTY(CCTMXTilesetInfo*, m_pTileSet, TileSet);
     /** Layer orientation, which is the same as the map orientation */
     CC_SYNTHESIZE(unsigned int, m_uLayerOrientation, LayerOrientation);
@@ -83,8 +88,14 @@ class CC_DLL CCTMXLayer : public CCSpriteBatchNode
 public:
     CCTMXLayer();
     virtual ~CCTMXLayer();
+    /** creates a CCTMXLayer with an tileset info, a layer info and a map info 
+    @deprecated: This interface will be deprecated sooner or later.
+    */
+    CC_DEPRECATED_ATTRIBUTE static CCTMXLayer * layerWithTilesetInfo(CCTMXTilesetInfo *tilesetInfo, CCTMXLayerInfo *layerInfo, CCTMXMapInfo *mapInfo);
+  
     /** creates a CCTMXLayer with an tileset info, a layer info and a map info */
-    static CCTMXLayer * layerWithTilesetInfo(CCTMXTilesetInfo *tilesetInfo, CCTMXLayerInfo *layerInfo, CCTMXMapInfo *mapInfo);
+    static CCTMXLayer * create(CCTMXTilesetInfo *tilesetInfo, CCTMXLayerInfo *layerInfo, CCTMXMapInfo *mapInfo);
+
     /** initializes a CCTMXLayer with a tileset info, a layer info and a map info */
     bool initWithTilesetInfo(CCTMXTilesetInfo *tilesetInfo, CCTMXLayerInfo *layerInfo, CCTMXMapInfo *mapInfo);
 
@@ -157,7 +168,7 @@ private:
 
     CCPoint calculateLayerOffset(const CCPoint& offset);
 
-    /* optimization methos */
+    /* optimization methods */
     CCSprite* appendTileForGID(unsigned int gid, const CCPoint& pos);
     CCSprite* insertTileForGID(unsigned int gid, const CCPoint& pos);
     CCSprite* updateTileForGID(unsigned int gid, const CCPoint& pos);
@@ -186,11 +197,14 @@ protected:
 
     //! used for optimization
     CCSprite            *m_pReusedTile;
-    _ccCArray            *m_pAtlasIndexArray;
+    ccCArray            *m_pAtlasIndexArray;
     
     // used for retina display
     float               m_fContentScaleFactor;
 };
+
+// end of tilemap_parallax_nodes group
+/// @}
 
 NS_CC_END
 

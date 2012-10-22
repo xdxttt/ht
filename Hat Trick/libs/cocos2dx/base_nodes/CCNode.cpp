@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2008-2010 Ricardo Quesada
 Copyright (c) 2009      Valentin Milea
 Copyright (c) 2011      Zynga Inc.
@@ -24,18 +24,18 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ****************************************************************************/
-#include "CCString.h"
+#include "cocoa/CCString.h"
 #include "CCNode.h"
-#include "CCPointExtension.h"
+#include "support/CCPointExtension.h"
 #include "support/TransformUtils.h"
 #include "CCCamera.h"
 #include "effects/CCGrid.h"
 #include "CCDirector.h"
 #include "CCScheduler.h"
-#include "CCTouch.h"
-#include "CCActionManager.h"
-#include "CCScriptSupport.h"
-#include "CCGLProgram.h"
+#include "touch_dispatcher/CCTouch.h"
+#include "actions/CCActionManager.h"
+#include "script_support/CCScriptSupport.h"
+#include "shaders/CCGLProgram.h"
 // externals
 #include "kazmath/GL/matrix.h"
 
@@ -71,8 +71,8 @@ CCNode::CCNode(void)
 , m_tContentSize(CCSizeZero)
 , m_bIsRunning(false)
 , m_pParent(NULL)
-// "whole screen" objects. like Scenes and Layers, should set isRelativeAnchorPoint to false
-, m_bIsRelativeAnchorPoint(true)
+// "whole screen" objects. like Scenes and Layers, should set m_bIgnoreAnchorPointForPosition to false
+, m_bIgnoreAnchorPointForPosition(false)
 , m_nTag(kCCNodeTagInvalid)
 // userData is always inited as nil
 , m_pUserData(NULL)
@@ -91,11 +91,16 @@ CCNode::CCNode(void)
     m_pActionManager->retain();
     m_pScheduler = director->getScheduler();
     m_pScheduler->retain();
+
+    CCScriptEngineProtocol* pEngine = CCScriptEngineManager::sharedManager()->getScriptEngine();
+    m_eScriptType = pEngine != NULL ? pEngine->getScriptType() : kScriptTypeNone;
 }
 
 CCNode::~CCNode(void)
 {
     CCLOGINFO( "cocos2d: deallocing" );
+    
+    unregisterScriptHandler();
 
     CC_SAFE_RELEASE(m_pActionManager);
     CC_SAFE_RELEASE(m_pScheduler);
@@ -121,7 +126,6 @@ CCNode::~CCNode(void)
 
     // children
     CC_SAFE_RELEASE(m_pChildren);
-
 }
 
 float CCNode::getSkewX()
@@ -169,7 +173,7 @@ void CCNode::setZOrder(int z)
     }
 }
 
-/// ertexZ getter
+/// vertexZ getter
 float CCNode::getVertexZ()
 {
     return m_fVertexZ;
@@ -324,13 +328,13 @@ void CCNode::setGrid(CCGridBase* pGrid)
 
 
 /// isVisible getter
-bool CCNode::getIsVisible()
+bool CCNode::isVisible()
 {
     return m_bIsVisible;
 }
 
 /// isVisible setter
-void CCNode::setIsVisible(bool var)
+void CCNode::setVisible(bool var)
 {
     m_bIsVisible = var;
 }
@@ -348,7 +352,7 @@ const CCPoint& CCNode::getAnchorPoint()
 
 void CCNode::setAnchorPoint(const CCPoint& point)
 {
-    if( ! CCPoint::CCPointEqualToPoint(point, m_tAnchorPoint) ) 
+    if( ! point.equals(m_tAnchorPoint))
     {
         m_tAnchorPoint = point;
         m_tAnchorPointInPoints = ccp( m_tContentSize.width * m_tAnchorPoint.x, m_tContentSize.height * m_tAnchorPoint.y );
@@ -357,14 +361,14 @@ void CCNode::setAnchorPoint(const CCPoint& point)
 }
 
 /// contentSize getter
-const CCSize& CCNode::getContentSize()
+const CCSize & CCNode::getContentSize()
 {
     return m_tContentSize;
 }
 
-void CCNode::setContentSize(const CCSize& size)
+void CCNode::setContentSize(const CCSize & size)
 {
-    if( ! CCSize::CCSizeEqualToSize(size, m_tContentSize) ) 
+    if( ! size.equals(m_tContentSize))
     {
         m_tContentSize = size;
 
@@ -374,11 +378,10 @@ void CCNode::setContentSize(const CCSize& size)
 }
 
 // isRunning getter
-bool CCNode::getIsRunning()
+bool CCNode::isRunning()
 {
     return m_bIsRunning;
 }
-
 
 /// parent getter
 CCNode * CCNode::getParent()
@@ -392,15 +395,18 @@ void CCNode::setParent(CCNode * var)
 }
 
 /// isRelativeAnchorPoint getter
-bool CCNode::getIsRelativeAnchorPoint()
+bool CCNode::isIgnoreAnchorPointForPosition()
 {
-    return m_bIsRelativeAnchorPoint;
+    return m_bIgnoreAnchorPointForPosition;
 }
 /// isRelativeAnchorPoint setter
-void CCNode::setIsRelativeAnchorPoint(bool newValue)
+void CCNode::ignoreAnchorPointForPosition(bool newValue)
 {
-    m_bIsRelativeAnchorPoint = newValue;
-    m_bIsTransformDirty = m_bIsInverseDirty = true;
+    if (newValue != m_bIgnoreAnchorPointForPosition) 
+    {
+		m_bIgnoreAnchorPointForPosition = newValue;
+		m_bIsTransformDirty = m_bIsInverseDirty = true;
+	}
 }
 
 /// tag getter
@@ -436,11 +442,15 @@ CCRect CCNode::boundingBox()
 
 CCNode * CCNode::node(void)
 {
-    CCNode * pRet = new CCNode();
-    pRet->autorelease();
-    return pRet;
+    return CCNode::create();
 }
 
+CCNode * CCNode::create(void)
+{
+	CCNode * pRet = new CCNode();
+	pRet->autorelease();
+	return pRet;
+}
 
 void CCNode::cleanup()
 {
@@ -455,13 +465,13 @@ void CCNode::cleanup()
 
 const char* CCNode::description()
 {
-    return CCString::stringWithFormat("<CCNode | Tag = %d>", m_nTag)->getCString();
+    return CCString::createWithFormat("<CCNode | Tag = %d>", m_nTag)->getCString();
 }
 
 // lazy allocs
 void CCNode::childrenAlloc(void)
 {
-    m_pChildren = CCArray::arrayWithCapacity(4);
+    m_pChildren = CCArray::createWithCapacity(4);
     m_pChildren->retain();
 }
 
@@ -483,7 +493,7 @@ CCNode* CCNode::getChildByTag(int aTag)
 }
 
 /* "add" logic MUST only be on this method
-* If a class want's to extend the 'addChild' behaviour it only needs
+* If a class want's to extend the 'addChild' behavior it only needs
 * to override this method
 */
 void CCNode::addChild(CCNode *child, int zOrder, int tag)
@@ -673,7 +683,7 @@ void CCNode::sortAllChildren()
  {
      //CCAssert(0);
      // override me
-     // Only use- this function to draw your staff.
+     // Only use- this function to draw your stuff.
      // DON'T draw your stuff outside this method
  }
 
@@ -790,20 +800,30 @@ void CCNode::onEnter()
 
     m_bIsRunning = true;
 
-    if (m_nScriptHandler)
+    if (m_eScriptType != kScriptTypeNone)
     {
-        CCScriptEngineManager::sharedManager()->getScriptEngine()->executeFunctionWithIntegerData(m_nScriptHandler, kCCNodeOnEnter);
+        CCScriptEngineManager::sharedManager()->getScriptEngine()->executeNodeEvent(this, kCCNodeOnEnter);
     }
 }
 
 void CCNode::onEnterTransitionDidFinish()
 {
     arrayMakeObjectsPerformSelector(m_pChildren, onEnterTransitionDidFinish, CCNode*);
+
+    if (m_eScriptType == kScriptTypeJavascript)
+    {
+        CCScriptEngineManager::sharedManager()->getScriptEngine()->executeNodeEvent(this, kCCNodeOnEnterTransitionDidFinish);
+    }
 }
 
 void CCNode::onExitTransitionDidStart()
 {
     arrayMakeObjectsPerformSelector(m_pChildren, onExitTransitionDidStart, CCNode*);
+
+    if (m_eScriptType == kScriptTypeJavascript)
+    {
+        CCScriptEngineManager::sharedManager()->getScriptEngine()->executeNodeEvent(this, kCCNodeOnExitTransitionDidStart);
+    }
 }
 
 void CCNode::onExit()
@@ -812,9 +832,9 @@ void CCNode::onExit()
 
     m_bIsRunning = false;
 
-    if (m_nScriptHandler)
+    if ( m_eScriptType != kScriptTypeNone)
     {
-        CCScriptEngineManager::sharedManager()->getScriptEngine()->executeFunctionWithIntegerData(m_nScriptHandler, kCCNodeOnExit);
+        CCScriptEngineManager::sharedManager()->getScriptEngine()->executeNodeEvent(this, kCCNodeOnExit);
     }
 
     arrayMakeObjectsPerformSelector(m_pChildren, onExit, CCNode*);
@@ -831,7 +851,7 @@ void CCNode::unregisterScriptHandler(void)
 {
     if (m_nScriptHandler)
     {
-        CCScriptEngineManager::sharedManager()->getScriptEngine()->removeLuaHandler(m_nScriptHandler);
+        CCScriptEngineManager::sharedManager()->getScriptEngine()->removeScriptHandler(m_nScriptHandler);
         LUALOG("[LUA] Remove CCNode event handler: %d", m_nScriptHandler);
         m_nScriptHandler = 0;
     }
@@ -923,12 +943,12 @@ void CCNode::schedule(SEL_SCHEDULE selector)
     this->schedule(selector, 0.0f, kCCRepeatForever, 0.0f);
 }
 
-void CCNode::schedule(SEL_SCHEDULE selector, ccTime interval)
+void CCNode::schedule(SEL_SCHEDULE selector, float interval)
 {
     this->schedule(selector, interval, kCCRepeatForever, 0.0f);
 }
 
-void CCNode::schedule(SEL_SCHEDULE selector, ccTime interval, unsigned int repeat, ccTime delay)
+void CCNode::schedule(SEL_SCHEDULE selector, float interval, unsigned int repeat, float delay)
 {
     CCAssert( selector, "Argument must be non-nil");
     CCAssert( interval >=0, "Argument must be positive");
@@ -936,7 +956,7 @@ void CCNode::schedule(SEL_SCHEDULE selector, ccTime interval, unsigned int repea
     m_pScheduler->scheduleSelector(selector, this, interval, !m_bIsRunning, repeat, delay);
 }
 
-void CCNode::scheduleOnce(SEL_SCHEDULE selector, ccTime delay)
+void CCNode::scheduleOnce(SEL_SCHEDULE selector, float delay)
 {
     this->schedule(selector, 0.0f, 0, delay);
 }
@@ -969,20 +989,23 @@ void CCNode::pauseSchedulerAndActions()
 
 CCAffineTransform CCNode::nodeToParentTransform(void)
 {
-    if ( m_bIsTransformDirty ) {
+    if (m_bIsTransformDirty) 
+    {
 
         // Translate values
         float x = m_tPosition.x;
         float y = m_tPosition.y;
 
-        if ( !m_bIsRelativeAnchorPoint ) {
+        if (m_bIgnoreAnchorPointForPosition) 
+        {
             x += m_tAnchorPointInPoints.x;
             y += m_tAnchorPointInPoints.y;
         }
 
         // Rotation values
         float c = 1, s = 0;
-        if( m_fRotation ) {
+        if (m_fRotation) 
+        {
             float radians = -CC_DEGREES_TO_RADIANS(m_fRotation);
             c = cosf(radians);
             s = sinf(radians);
@@ -993,7 +1016,8 @@ CCAffineTransform CCNode::nodeToParentTransform(void)
 
         // optimization:
         // inline anchor point calculation if skew is not needed
-        if( !needsSkewMatrix && !CCPoint::CCPointEqualToPoint(m_tAnchorPointInPoints, CCPointZero) ) {
+        if (! needsSkewMatrix && !m_tAnchorPointInPoints.equals(CCPointZero))
+        {
             x += c * -m_tAnchorPointInPoints.x * m_fScaleX + -s * -m_tAnchorPointInPoints.y * m_fScaleY;
             y += s * -m_tAnchorPointInPoints.x * m_fScaleX +  c * -m_tAnchorPointInPoints.y * m_fScaleY;
         }
@@ -1006,15 +1030,18 @@ CCAffineTransform CCNode::nodeToParentTransform(void)
 
         // XXX: Try to inline skew
         // If skew is needed, apply skew and then anchor point
-        if( needsSkewMatrix ) {
+        if (needsSkewMatrix) 
+        {
             CCAffineTransform skewMatrix = CCAffineTransformMake(1.0f, tanf(CC_DEGREES_TO_RADIANS(m_fSkewY)),
                 tanf(CC_DEGREES_TO_RADIANS(m_fSkewX)), 1.0f,
                 0.0f, 0.0f );
             m_tTransform = CCAffineTransformConcat(skewMatrix, m_tTransform);
 
             // adjust anchor point
-            if( ! CCPoint::CCPointEqualToPoint(m_tAnchorPointInPoints, CCPointZero) )
+            if (!m_tAnchorPointInPoints.equals(CCPointZero))
+            {
                 m_tTransform = CCAffineTransformTranslate(m_tTransform, -m_tAnchorPointInPoints.x, -m_tAnchorPointInPoints.y);
+            }
         }
 
         m_bIsTransformDirty = false;
@@ -1081,14 +1108,12 @@ CCPoint CCNode::convertToWindowSpace(const CCPoint& nodePoint)
 // convenience methods which take a CCTouch instead of CCPoint
 CCPoint CCNode::convertTouchToNodeSpace(CCTouch *touch)
 {
-    CCPoint point = touch->locationInView();
-    point = CCDirector::sharedDirector()->convertToGL(point);
+    CCPoint point = touch->getLocation();
     return this->convertToNodeSpace(point);
 }
 CCPoint CCNode::convertTouchToNodeSpaceAR(CCTouch *touch)
 {
-    CCPoint point = touch->locationInView();
-    point = CCDirector::sharedDirector()->convertToGL(point);
+    CCPoint point = touch->getLocation();
     return this->convertToNodeSpaceAR(point);
 }
 

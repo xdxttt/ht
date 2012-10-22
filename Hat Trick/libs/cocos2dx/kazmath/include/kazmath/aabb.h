@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef KAZMATH_AABB_H_INCLUDED
 #define KAZMATH_AABB_H_INCLUDED
 
-#include "CCPlatformMacros.h"
+#include "platform/CCPlatformMacros.h"
 #include "vec3.h"
 #include "utility.h"
 
@@ -35,7 +35,7 @@ extern "C" {
 #endif
 
 /**
- * A struture that represents an axis-aligned
+ * A structure that represents an axis-aligned
  * bounding box.
  */
 typedef struct kmAABB {

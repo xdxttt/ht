@@ -31,16 +31,59 @@
 #include "CCPlatformConfig.h"
 #include "CCPlatformDefine.h"
 
-/** @def CC_ENABLE_CACHE_TEXTTURE_DATA
+/**
+ * define a create function for a specific type, such as CCLayer
+ * @__TYPE__ class type to add create(), such as CCLayer
+ */
+#define CREATE_FUNC(__TYPE__) \
+static __TYPE__* create() \
+{ \
+    __TYPE__ *pRet = new __TYPE__(); \
+    if (pRet && pRet->init()) \
+    { \
+        pRet->autorelease(); \
+        return pRet; \
+    } \
+    else \
+    { \
+        delete pRet; \
+        pRet = NULL; \
+        return NULL; \
+    } \
+}
+
+/**
+ * define a node function for a specific type, such as CCLayer
+ * @__TYPE__ class type to add node(), such as CCLayer
+ * @deprecated: This interface will be deprecated sooner or later.
+ */
+#define NODE_FUNC(__TYPE__) \
+CC_DEPRECATED_ATTRIBUTE static __TYPE__* node() \
+{ \
+    __TYPE__ *pRet = new __TYPE__(); \
+    if (pRet && pRet->init()) \
+    { \
+        pRet->autorelease(); \
+        return pRet; \
+    } \
+    else \
+    { \
+        delete pRet; \
+        pRet = NULL; \
+        return NULL; \
+    } \
+}
+
+/** @def CC_ENABLE_CACHE_TEXTURE_DATA
 Enable it if you want to cache the texture data.
 Basically,it's only enabled in android
 
 It's new in cocos2d-x since v0.99.5
 */
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-    #define CC_ENABLE_CACHE_TEXTTURE_DATA       1
+    #define CC_ENABLE_CACHE_TEXTURE_DATA       1
 #else
-    #define CC_ENABLE_CACHE_TEXTTURE_DATA       0
+    #define CC_ENABLE_CACHE_TEXTURE_DATA       0
 #endif
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID) || (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
@@ -59,16 +102,10 @@ It's new in cocos2d-x since v0.99.5
     #define NS_CC_BEGIN                     namespace cocos2d {
     #define NS_CC_END                       }
     #define USING_NS_CC                     using namespace cocos2d
-    #define NS_CC_EXT_BEGIN                 namespace cocos2d { namespace extension { 
-    #define NS_CC_EXT_END                   }} 
-    #define USING_NS_CC_EXT                 using namespace cocos2d::extension
 #else
-    #define NS_CC_BEGIN                     
-    #define NS_CC_END
-    #define USING_NS_CC                     
-    #define NS_CC_EXT_BEGIN                 
-    #define NS_CC_EXT_END    
-    #define USING_NS_CC_EXT 
+    #define NS_CC_BEGIN 
+    #define NS_CC_END 
+    #define USING_NS_CC 
 #endif 
 
 /** CC_PROPERTY_READONLY is used to declare a protected variable.
@@ -166,22 +203,27 @@ public: virtual void set##funName(varType var)   \
 #define CC_SAFE_RETAIN(p)            do { if(p) { (p)->retain(); } } while(0)
 #define CC_BREAK_IF(cond)            if(cond) break
 
+#define __CCLOGWITHFUNCTION(s, ...) \
+    CCLog("%s : %s",__FUNCTION__, CCString::createWithFormat(s, ##__VA_ARGS__)->getCString())
 
 // cocos2d debug
 #if !defined(COCOS2D_DEBUG) || COCOS2D_DEBUG == 0
-#define CCLOG(...)              
-#define CCLOGINFO(...)         
-#define CCLOGERROR(...)         
+#define CCLOG(...)       do {} while (0)
+#define CCLOGINFO(...)   do {} while (0)
+#define CCLOGERROR(...)  do {} while (0)
+#define CCLOGWARN(...)   do {} while (0)
 
 #elif COCOS2D_DEBUG == 1
 #define CCLOG(format, ...)      cocos2d::CCLog(format, ##__VA_ARGS__)
 #define CCLOGERROR(format,...)  cocos2d::CCLog(format, ##__VA_ARGS__)
 #define CCLOGINFO(format,...)   do {} while (0)
+#define CCLOGWARN(...) __CCLOGWITHFUNCTION(__VA_ARGS__)
 
 #elif COCOS2D_DEBUG > 1
 #define CCLOG(format, ...)      cocos2d::CCLog(format, ##__VA_ARGS__)
 #define CCLOGERROR(format,...)  cocos2d::CCLog(format, ##__VA_ARGS__)
 #define CCLOGINFO(format,...)   cocos2d::CCLog(format, ##__VA_ARGS__)
+#define CCLOGWARN(...) __CCLOGWITHFUNCTION(__VA_ARGS__)
 #endif // COCOS2D_DEBUG
 
 // Lua engine debug
@@ -191,5 +233,15 @@ public: virtual void set##funName(varType var)   \
 #define LUALOG(format, ...)     cocos2d::CCLog(format, ##__VA_ARGS__)
 #endif // Lua engine debug
 
+/*
+ * only certain compilers support __attribute__((deprecated))
+ */
+#if defined(__GNUC__) && ((__GNUC__ >= 4) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 1)))
+    #define CC_DEPRECATED_ATTRIBUTE __attribute__((deprecated))
+#elif _MSC_VER >= 1400 //vs 2005 or higher
+    #define CC_DEPRECATED_ATTRIBUTE __declspec(deprecated) 
+#else
+    #define CC_DEPRECATED_ATTRIBUTE
+#endif 
 
 #endif // __CC_PLATFORM_MACROS_H__

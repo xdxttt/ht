@@ -7,10 +7,10 @@ using namespace CocosDenshion;
 CCScene* Play::scene()
 {
 	// 'scene' is an autorelease object
-	CCScene *scene = CCScene::node();
+	CCScene *scene = CCScene::create();
 	
 	// 'layer' is an autorelease object
-	Play *layer = Play::node();
+	Play *layer = Play::create();
 
 	// add layer as a child to scene
 	scene->addChild(layer);
@@ -22,7 +22,7 @@ CCScene* Play::scene()
 // on "init" you need to initialize your instance
 bool Play::init()
 {
-    this->setIsTouchEnabled(true);
+    this->setTouchEnabled(true);
     switch_speed = 1;
     isInCup = false;
     isLayoutCoin = true;
@@ -44,32 +44,32 @@ bool Play::init()
 
     scale = width/960.0;
     float height_scale = height/640.0;
-	CCMenuItemImage *pCloseItem = CCMenuItemImage::itemWithNormalImage("reset.png","reset_2.png",this,menu_selector(Play::menuCloseCallback));
-    CCMenuItemImage *pSettigItem = CCMenuItemImage::itemWithNormalImage("setting.png","setting_2.png",this,menu_selector(Play::menuSettingCallback));
+	CCMenuItemImage *pCloseItem = CCMenuItemImage::create("reset.png","reset_2.png",this,menu_selector(Play::menuCloseCallback));
+    CCMenuItemImage *pSettigItem = CCMenuItemImage::create("setting.png","setting_2.png",this,menu_selector(Play::menuSettingCallback));
 	pCloseItem->setPosition( ccp(width - width*0.1, height*0.9) );
     pCloseItem->setScale(scale);
     
 	pSettigItem->setPosition( ccp(width*0.1,height*0.9) );
     pSettigItem->setScale(scale);
 	// create menu, it's an autorelease object
-	pMainMenu = CCMenu::menuWithItems(pCloseItem,pSettigItem, NULL);
+	pMainMenu = CCMenu::create(pCloseItem,pSettigItem, NULL);
 	pMainMenu->setPosition( CCPointZero );
 	this->addChild(pMainMenu, 1);
     
-    CCMenuItemImage *pHelpItem = CCMenuItemImage::itemWithNormalImage("tutorial.png","tutorial_2.png",this,menu_selector(Play::menuHelpCallback));
+    CCMenuItemImage *pHelpItem = CCMenuItemImage::create("tutorial.png","tutorial_2.png",this,menu_selector(Play::menuHelpCallback));
 	pHelpItem->setPosition( ccp(width*0.1+pSettigItem->boundingBox().size.width*2, height*0.9) );
     pHelpItem->setScale(scale);
     
-	pSettingMenu = CCMenu::menuWithItems(pHelpItem, NULL);
+	pSettingMenu = CCMenu::create(pHelpItem, NULL);
 	pSettingMenu->setPosition( CCPointZero );
 	this->addChild(pSettingMenu, 1);
-    pSettingMenu->setIsVisible(false);
+    pSettingMenu->setVisible(false);
     
 
 	CCSize size = CCDirector::sharedDirector()->getWinSize();
 
     jump_height = height*0.3;
-    CCSprite* bg = CCSprite::spriteWithFile("bg.png");
+    CCSprite* bg = CCSprite::create("bg.png");
     bg->setPositionX(CCDirector::sharedDirector()->getWinSize().width/2);
     bg->setPositionY(CCDirector::sharedDirector()->getWinSize().height/2);
     bg->setScaleX(scale);
@@ -79,23 +79,23 @@ bool Play::init()
     hat_texture = CCTextureCache::sharedTextureCache()->addImage("hat.png");
     hat_texture_2 = CCTextureCache::sharedTextureCache()->addImage("hat_2.png");
 
-    pSprite_a = CCSprite::spriteWithTexture(hat_texture);
+    pSprite_a = CCSprite::createWithTexture(hat_texture);
     pSprite_a->setScale(scale);
-    pSprite_b = CCSprite::spriteWithTexture(hat_texture);
+    pSprite_b = CCSprite::createWithTexture(hat_texture);
     pSprite_b->setScale(scale);
-    pSprite_c = CCSprite::spriteWithTexture(hat_texture);
+    pSprite_c = CCSprite::createWithTexture(hat_texture);
     pSprite_c->setScale(scale);
     
-    pShadow_a = CCSprite::spriteWithFile("shadow.png");
+    pShadow_a = CCSprite::create("shadow.png");
     pShadow_a->setScale(scale);
-    pShadow_b = CCSprite::spriteWithFile("shadow.png");
+    pShadow_b = CCSprite::create("shadow.png");
     pShadow_b->setScale(scale);
-    pShadow_c = CCSprite::spriteWithFile("shadow.png");
+    pShadow_c = CCSprite::create("shadow.png");
     pShadow_c->setScale(scale);
     
     double hat_height = pSprite_c->boundingBox().size.height;
     
-    pCoin = CCSprite::spriteWithFile("coin.png");
+    pCoin = CCSprite::create("coin.png");
     pCoin->setScale(scale);
     
     pCoin->boundingBox();
@@ -128,14 +128,14 @@ bool Play::init()
     this->addChild(pShadow_c, 1);
     
     this->addChild(bg, -1);
-	this->setIsTouchEnabled(true);
+	this->setTouchEnabled(true);
 
 	return true;
 }
 
 void Play::ccTouchesBegan(cocos2d::CCSet *pTouches, cocos2d::CCEvent *pEvent){
 
-    pSettingMenu->setIsVisible(false);
+    pSettingMenu->setVisible(false);
     isFingerMoved = false;
     touchMoveCount = 0;
     touchMaxPoint = 0;
@@ -143,25 +143,25 @@ void Play::ccTouchesBegan(cocos2d::CCSet *pTouches, cocos2d::CCEvent *pEvent){
     for(CCSetIterator iterTouch = pTouches->begin(); iterTouch != pTouches->end(); iterTouch++)
     {
         CCTouch *pTouch =  (cocos2d::CCTouch*)(*iterTouch);
-        m_touchPoint = pTouch->locationInView( );
+        m_touchPoint = pTouch->getLocation();
         m_touchPoint = CCDirector::sharedDirector()->convertToGL( m_touchPoint );
         
-        if (pCoin->getIsVisible()) {
+        if (pCoin->isVisible()) {
             CCRect touchRect = cocos2d::CCRectMake( m_touchPoint.x,  m_touchPoint.y, 30, 30);
             CCRect cionRect = pCoin->boundingBox();
-            if( CCRect::CCRectIntersectsRect(cionRect, touchRect)){
+            if(cionRect.intersectsRect(touchRect)){
                 
-                CCPoint touchPoint = pTouch->locationInView();
+                CCPoint touchPoint = pTouch->getLocation();
                 touchPoint = CCDirector::sharedDirector()->convertToGL( touchPoint );                        
                 cocos2d::CCPoint delta = ccpSub(touchPoint, pCoin->getPosition());
                 cocos2d::CCPoint p = pCoin->getPosition();
                 pCoin->setPosition(ccpAdd(p, delta));
                 
-                if( CCRect::CCRectIntersectsRect(pSprite_a->boundingBox(), cionRect)){
+                if(pSprite_a->boundingBox().intersectsRect(cionRect)){
                     isInCup = true;
-                }else if( CCRect::CCRectIntersectsRect(pSprite_b->boundingBox(), cionRect)){
+                }else if(pSprite_b->boundingBox().intersectsRect( cionRect)){
                     isInCup = true;
-                }else if ( CCRect::CCRectIntersectsRect(pSprite_c->boundingBox(), cionRect)) {
+                }else if(pSprite_c->boundingBox().intersectsRect( cionRect)) {
                     isInCup = true;
                 }else {
                     isInCup = false;
@@ -175,7 +175,7 @@ void Play::ccTouchesBegan(cocos2d::CCSet *pTouches, cocos2d::CCEvent *pEvent){
     return ;
 }
 void Play::setInvisible(CCNode * node){
-    node->setIsVisible(false);
+    node->setVisible(false);
 }
 void Play::closeHat(CCSprite* node){
     CCTexture2D* hat_texture = CCTextureCache::sharedTextureCache()->textureForKey("hat.png");
@@ -199,90 +199,90 @@ void Play::ccTouchesMoved(cocos2d::CCSet *pTouches, cocos2d::CCEvent *pEvent){
     for(CCSetIterator iterTouch = pTouches->begin(); iterTouch != pTouches->end(); iterTouch++)
     {
         CCTouch *pTouch =  (cocos2d::CCTouch*)(*iterTouch);
-        CCPoint _touchPoint = pTouch->locationInView();
+        CCPoint _touchPoint = pTouch->getLocation();
         _touchPoint = CCDirector::sharedDirector()->convertToGL( _touchPoint );
         
         if (_touchPoint.x!=m_touchPoint.x&&_touchPoint.y!=m_touchPoint.y) {
             isFingerMoved = true;
         }
         
-        if (pCoin->getIsVisible()) {
+        if (pCoin->isVisible()) {
           
             CCRect touchRect = cocos2d::CCRectMake( _touchPoint.x,  _touchPoint.y, 30, 30);
             CCRect cionRect = pCoin->boundingBox();
-            if( CCRect::CCRectIntersectsRect(cionRect, touchRect)){
-                CCPoint touchPoint = pTouch->locationInView();
+            if(cionRect.intersectsRect(touchRect)){
+                CCPoint touchPoint = pTouch->getLocation();
                 touchPoint = CCDirector::sharedDirector()->convertToGL( touchPoint );                        
                 cocos2d::CCPoint delta = ccpSub(touchPoint, pCoin->getPosition());
                 cocos2d::CCPoint p = pCoin->getPosition();
                 pCoin->setPosition(ccpAdd(p, delta));
                 
                 if (!isInCup) {
-                    if( CCRect::CCRectIntersectsRect(pSprite_a->boundingBox(), cionRect)){
-                        CCMoveTo* moveto = CCMoveTo::actionWithDuration(0.8,shadow_pointe_a);
-                        CCMoveTo* moveto2 = CCMoveTo::actionWithDuration(0.2, pointe_a);
-                        CCScaleTo* iconsc=CCScaleTo::actionWithDuration(1, 0.6*this->scale);  
-                        pCoin->runAction( CCSpawn::actions(CCSequence::actions(moveto,moveto2,CCCallFuncN::actionWithTarget(pCoin,callfuncN_selector(Play::setInvisible)),NULL),iconsc, NULL));
+                    if(pSprite_a->boundingBox().intersectsRect(cionRect)){
+                        CCMoveTo* moveto = CCMoveTo::create(0.8,shadow_pointe_a);
+                        CCMoveTo* moveto2 = CCMoveTo::create(0.2, pointe_a);
+                        CCScaleTo* iconsc=CCScaleTo::create(1, 0.6*this->scale);  
+                        pCoin->runAction( CCSpawn::create(CCSequence::create(moveto,moveto2,CCCallFuncN::create(pCoin,callfuncN_selector(Play::setInvisible)),NULL),iconsc, NULL));
                       
-                        CCScaleTo* sc1 = CCScaleTo::actionWithDuration(switch_speed/2.0, 0.6*this->scale);
-                        CCScaleTo* sc2 = CCScaleTo::actionWithDuration(switch_speed/2.0, 1*this->scale);
-                        CCFiniteTimeAction *sq1 = CCSequence::actions(sc1,sc2,NULL);
+                        CCScaleTo* sc1 = CCScaleTo::create(switch_speed/2.0, 0.6*this->scale);
+                        CCScaleTo* sc2 = CCScaleTo::create(switch_speed/2.0, 1*this->scale);
+                        CCFiniteTimeAction *sq1 = CCSequence::create(sc1,sc2,NULL);
                         pShadow_a->runAction(sq1);
   
                         
-                        CCJumpTo* jump = CCJumpTo::actionWithDuration(1,pointe_a,height*0.2,1);
-                        pSprite_a->runAction( CCSequence::actions(jump,CCCallFuncN::actionWithTarget(pSprite_a,callfuncN_selector(Play::closeHat)), NULL));
+                        CCJumpTo* jump = CCJumpTo::create(1,pointe_a,height*0.2,1);
+                        pSprite_a->runAction( CCSequence::create(jump,CCCallFuncN::create(pSprite_a,callfuncN_selector(Play::closeHat)), NULL));
                         pSprite_a->setTexture(hat_texture_2);
                         SimpleAudioEngine::sharedEngine()->playEffect("hat.mp3");
 
                         isLayoutCoin = false;
-                    }else if( CCRect::CCRectIntersectsRect(pSprite_b->boundingBox(), cionRect)){
+                    }else if(pSprite_b->boundingBox().intersectsRect( cionRect)){
                         
-                       // CCJumpTo* jumpto = CCJumpTo::actionWithDuration(1, pointe_b,jump_height,1);
-                        CCMoveTo* moveto = CCMoveTo::actionWithDuration(0.8, shadow_pointe_b);
-                        CCMoveTo* moveto2 = CCMoveTo::actionWithDuration(0.2, pointe_b);
-                        CCScaleTo* iconsc=CCScaleTo::actionWithDuration(1, 0.6*this->scale); 
-                        pCoin->runAction( CCSpawn::actions(CCSequence::actions(moveto,moveto2,CCCallFuncN::actionWithTarget(pCoin,callfuncN_selector(Play::setInvisible)),NULL),iconsc, NULL));
+                       // CCJumpTo* jumpto = CCJumpTo::create(1, pointe_b,jump_height,1);
+                        CCMoveTo* moveto = CCMoveTo::create(0.8, shadow_pointe_b);
+                        CCMoveTo* moveto2 = CCMoveTo::create(0.2, pointe_b);
+                        CCScaleTo* iconsc=CCScaleTo::create(1, 0.6*this->scale); 
+                        pCoin->runAction( CCSpawn::create(CCSequence::create(moveto,moveto2,CCCallFuncN::create(pCoin,callfuncN_selector(Play::setInvisible)),NULL),iconsc, NULL));
                         
-                        CCScaleTo* sc1 = CCScaleTo::actionWithDuration(switch_speed/2.0, 0.6*this->scale);
-                        CCScaleTo* sc2 = CCScaleTo::actionWithDuration(switch_speed/2.0, 1*this->scale);
-                        CCFiniteTimeAction *sq1 = CCSequence::actions(sc1,sc2,NULL);
+                        CCScaleTo* sc1 = CCScaleTo::create(switch_speed/2.0, 0.6*this->scale);
+                        CCScaleTo* sc2 = CCScaleTo::create(switch_speed/2.0, 1*this->scale);
+                        CCFiniteTimeAction *sq1 = CCSequence::create(sc1,sc2,NULL);
                         pShadow_b->runAction(sq1);
                         
-                        CCJumpTo* jump = CCJumpTo::actionWithDuration(1, pointe_b,height*0.2,1);
-                        pSprite_b->runAction( CCSequence::actions(jump,CCCallFuncN::actionWithTarget(pSprite_b,callfuncN_selector(Play::closeHat)), NULL));
+                        CCJumpTo* jump = CCJumpTo::create(1, pointe_b,height*0.2,1);
+                        pSprite_b->runAction( CCSequence::create(jump,CCCallFuncN::create(pSprite_b,callfuncN_selector(Play::closeHat)), NULL));
                         pSprite_b->setTexture(hat_texture_2);
                         SimpleAudioEngine::sharedEngine()->playEffect("hat.mp3");
 
                         isLayoutCoin = false;
-                    }else if ( CCRect::CCRectIntersectsRect(pSprite_c->boundingBox(), cionRect)) {
+                    }else if (pSprite_c->boundingBox().intersectsRect(cionRect)) {
                         
-                        CCMoveTo* moveto = CCMoveTo::actionWithDuration(0.8, shadow_pointe_c);
-                        CCMoveTo* moveto2 = CCMoveTo::actionWithDuration(0.2, pointe_c);
-                        CCScaleTo* iconsc=CCScaleTo::actionWithDuration(1, 0.8*this->scale); 
+                        CCMoveTo* moveto = CCMoveTo::create(0.8, shadow_pointe_c);
+                        CCMoveTo* moveto2 = CCMoveTo::create(0.2, pointe_c);
+                        CCScaleTo* iconsc=CCScaleTo::create(1, 0.8*this->scale); 
 
-                        pCoin->runAction( CCSpawn::actions(CCSequence::actions(moveto,moveto2,CCCallFuncN::actionWithTarget(pCoin,callfuncN_selector(Play::setInvisible)),NULL),iconsc, NULL));
+                        pCoin->runAction( CCSpawn::create(CCSequence::create(moveto,moveto2,CCCallFuncN::create(pCoin,callfuncN_selector(Play::setInvisible)),NULL),iconsc, NULL));
                         
                         
-                        CCScaleTo* sc1 = CCScaleTo::actionWithDuration(switch_speed/2.0, 0.6*this->scale);
-                        CCScaleTo* sc2 = CCScaleTo::actionWithDuration(switch_speed/2.0, 1*this->scale);
-                        CCFiniteTimeAction *sq1 = CCSequence::actions(sc1,sc2,NULL);
+                        CCScaleTo* sc1 = CCScaleTo::create(switch_speed/2.0, 0.6*this->scale);
+                        CCScaleTo* sc2 = CCScaleTo::create(switch_speed/2.0, 1*this->scale);
+                        CCFiniteTimeAction *sq1 = CCSequence::create(sc1,sc2,NULL);
                         pShadow_c->runAction(sq1);
                         
                         
-                        CCJumpTo* jump = CCJumpTo::actionWithDuration(1, pointe_c,height*0.2,1);
-                        pSprite_c->runAction( CCSequence::actions(jump,CCCallFuncN::actionWithTarget(pSprite_c,callfuncN_selector(Play::closeHat)), NULL));
+                        CCJumpTo* jump = CCJumpTo::create(1, pointe_c,height*0.2,1);
+                        pSprite_c->runAction( CCSequence::create(jump,CCCallFuncN::create(pSprite_c,callfuncN_selector(Play::closeHat)), NULL));
                         pSprite_c->setTexture(hat_texture_2);
                         SimpleAudioEngine::sharedEngine()->playEffect("hat.mp3");
 
                         isLayoutCoin = false;
                     }
                 }else {
-                    if( CCRect::CCRectIntersectsRect(pSprite_a->boundingBox(), cionRect)){
+                    if(pSprite_a->boundingBox().intersectsRect(cionRect)){
                        
-                    }else if( CCRect::CCRectIntersectsRect(pSprite_b->boundingBox(), cionRect)){
+                    }else if(pSprite_b->boundingBox().intersectsRect( cionRect)){
                         
-                    }else if ( CCRect::CCRectIntersectsRect(pSprite_c->boundingBox(), cionRect)) {
+                    }else if (pSprite_c->boundingBox().intersectsRect(cionRect)) {
                         
                     }else {
                         isInCup = false;
@@ -290,7 +290,7 @@ void Play::ccTouchesMoved(cocos2d::CCSet *pTouches, cocos2d::CCEvent *pEvent){
                 }
             }else{
              
-                // CCJumpTo* jump = CCJumpTo::actionWithDuration(0.5, pCoin->getPosition(),10,1);
+                // CCJumpTo* jump = CCJumpTo::create(0.5, pCoin->getPosition(),10,1);
                 // pCoin->runAction( CCSequence::actions(jump, NULL));
             }
         }else{
@@ -299,7 +299,7 @@ void Play::ccTouchesMoved(cocos2d::CCSet *pTouches, cocos2d::CCEvent *pEvent){
                 
             }else {
                 if(isFingerMoved&&touchMoveCount>3){
-                    if (pTouch->previousLocationInView( ).x<size.width/2) {
+                    if (pTouch->getPreviousLocation( ).x<size.width/2) {
                         if (touchMaxPoint==1) {
                             switchLeftCion();
                         }
@@ -327,12 +327,12 @@ void Play::ccTouchesEnded(cocos2d::CCSet *pTouches, cocos2d::CCEvent *pEvent){
     touchMoveCount = 0;
     for(CCSetIterator iterTouch = pTouches->begin(); iterTouch != pTouches->end(); iterTouch++)
     {
-        if (!pCoin->getIsVisible()) {
+        if (!pCoin->isVisible()) {
             isLayoutCoin = false;
             if (!isFingerMoved) {
                 
                 CCTouch *pTouch =  (cocos2d::CCTouch*)(*iterTouch);
-                CCPoint touchPoint = pTouch->locationInView();
+                CCPoint touchPoint = pTouch->getLocation();
                 touchPoint = CCDirector::sharedDirector()->convertToGL( touchPoint );
                 CCRect touchRect = cocos2d::CCRectMake( touchPoint.x,  touchPoint.y, 5, 5);
                 CCRect coinbb ;
@@ -341,54 +341,54 @@ void Play::ccTouchesEnded(cocos2d::CCSet *pTouches, cocos2d::CCEvent *pEvent){
                 coinbb.origin.x = pCoin->getPositionX()-pSprite_a->boundingBox().size.width/2;
                 coinbb.origin.y = pCoin->getPositionY()-pSprite_a->boundingBox().size.height/2;
                 
-                if( CCRect::CCRectIntersectsRect(coinbb, touchRect)){
+                if( coinbb.intersectsRect(touchRect)){
                     CCPoint point = pCoin->getPosition();
                     point.y=height*0.2;
-                    CCMoveTo* moveto = CCMoveTo::actionWithDuration(1, point);
+                    CCMoveTo* moveto = CCMoveTo::create(1, point);
                     pCoin->setScale(0.6*this->scale);
-                    CCScaleTo* scale=CCScaleTo::actionWithDuration(1, this->scale); 
-                    CCRotateTo *rot = CCRotateTo::actionWithDuration(0.1, 20);
-                    CCRotateTo *rot2 = CCRotateTo::actionWithDuration(0.1, -20);
-                    CCRotateTo *rot3 = CCRotateTo::actionWithDuration(0.1, 10);
-                    CCRotateTo *rot4 = CCRotateTo::actionWithDuration(0.1, -10);
-                    CCRotateTo *rot5 = CCRotateTo::actionWithDuration(0.1, 0);
-                    pCoin->runAction( CCSpawn::actions(scale,CCSequence::actions(moveto,CCCallFuncN::actionWithTarget(pCoin,callfuncN_selector(Play::playCoinMp3)),rot,rot2,rot3,rot4,rot5,NULL),NULL));
-                    pCoin->setIsVisible(true);
+                    CCScaleTo* scale=CCScaleTo::create(1, this->scale); 
+                    CCRotateTo *rot = CCRotateTo::create(0.1, 20);
+                    CCRotateTo *rot2 = CCRotateTo::create(0.1, -20);
+                    CCRotateTo *rot3 = CCRotateTo::create(0.1, 10);
+                    CCRotateTo *rot4 = CCRotateTo::create(0.1, -10);
+                    CCRotateTo *rot5 = CCRotateTo::create(0.1, 0);
+                    pCoin->runAction( CCSpawn::create(scale,CCSequence::create(moveto,CCCallFuncN::create(pCoin,callfuncN_selector(Play::playCoinMp3)),rot,rot2,rot3,rot4,rot5,NULL),NULL));
+                    pCoin->setVisible(true);
                     isLayoutCoin = true;
                     isInCup = false;
                 }
                 
                
-                if( CCRect::CCRectIntersectsRect(pSprite_a->boundingBox(), touchRect)){
+                if(pSprite_a->boundingBox().intersectsRect(touchRect)){
                     
-                    CCScaleTo* sc1 = CCScaleTo::actionWithDuration(switch_speed/2.0, 0.6*scale);
-                    CCScaleTo* sc2 = CCScaleTo::actionWithDuration(switch_speed/2.0, 1*scale);
-                    CCFiniteTimeAction *sq1 = CCSequence::actions(sc1,sc2,NULL);
+                    CCScaleTo* sc1 = CCScaleTo::create(switch_speed/2.0, 0.6*scale);
+                    CCScaleTo* sc2 = CCScaleTo::create(switch_speed/2.0, 1*scale);
+                    CCFiniteTimeAction *sq1 = CCSequence::create(sc1,sc2,NULL);
                     pShadow_a->runAction(sq1);
-                    CCJumpTo* jump = CCJumpTo::actionWithDuration(1, pointe_a,height*0.2,1);
-                    pSprite_a->runAction( CCSequence::actions(jump,CCCallFuncN::actionWithTarget(pSprite_a,callfuncN_selector(Play::closeHat)), NULL));
+                    CCJumpTo* jump = CCJumpTo::create(1, pointe_a,height*0.2,1);
+                    pSprite_a->runAction( CCSequence::create(jump,CCCallFuncN::create(pSprite_a,callfuncN_selector(Play::closeHat)), NULL));
                     pSprite_a->setTexture(hat_texture_2);
                     SimpleAudioEngine::sharedEngine()->playEffect("hat.mp3");
 
-                }else if( CCRect::CCRectIntersectsRect(pSprite_b->boundingBox(), touchRect)){
-                    CCScaleTo* sc1 = CCScaleTo::actionWithDuration(switch_speed/2.0, 0.6*scale);
-                    CCScaleTo* sc2 = CCScaleTo::actionWithDuration(switch_speed/2.0, 1*scale);
-                    CCFiniteTimeAction *sq1 = CCSequence::actions(sc1,sc2,NULL);
+                }else if(pSprite_b->boundingBox().intersectsRect(touchRect)){
+                    CCScaleTo* sc1 = CCScaleTo::create(switch_speed/2.0, 0.6*scale);
+                    CCScaleTo* sc2 = CCScaleTo::create(switch_speed/2.0, 1*scale);
+                    CCFiniteTimeAction *sq1 = CCSequence::create(sc1,sc2,NULL);
                     pShadow_b->runAction(sq1);
                     
-                    CCJumpTo* jump = CCJumpTo::actionWithDuration(1, pointe_b,height*0.2,1);
-                    pSprite_b->runAction( CCSequence::actions(jump,CCCallFuncN::actionWithTarget(pSprite_b,callfuncN_selector(Play::closeHat)), NULL));
+                    CCJumpTo* jump = CCJumpTo::create(1, pointe_b,height*0.2,1);
+                    pSprite_b->runAction( CCSequence::create(jump,CCCallFuncN::create(pSprite_b,callfuncN_selector(Play::closeHat)), NULL));
                     pSprite_b->setTexture(hat_texture_2);
                     SimpleAudioEngine::sharedEngine()->playEffect("hat.mp3");
 
-                }else if ( CCRect::CCRectIntersectsRect(pSprite_c->boundingBox(), touchRect)) {
-                    CCScaleTo* sc1 = CCScaleTo::actionWithDuration(switch_speed/2.0, 0.6*scale);
-                    CCScaleTo* sc2 = CCScaleTo::actionWithDuration(switch_speed/2.0, 1*scale);
-                    CCFiniteTimeAction *sq1 = CCSequence::actions(sc1,sc2,NULL);
+                }else if (pSprite_c->boundingBox().intersectsRect( touchRect)) {
+                    CCScaleTo* sc1 = CCScaleTo::create(switch_speed/2.0, 0.6*scale);
+                    CCScaleTo* sc2 = CCScaleTo::create(switch_speed/2.0, 1*scale);
+                    CCFiniteTimeAction *sq1 = CCSequence::create(sc1,sc2,NULL);
                     pShadow_c->runAction(sq1);
                     
-                    CCJumpTo* jump = CCJumpTo::actionWithDuration(1, pointe_c,height*0.2,1);
-                    pSprite_c->runAction( CCSequence::actions(jump,CCCallFuncN::actionWithTarget(pSprite_c,callfuncN_selector(Play::closeHat)), NULL));
+                    CCJumpTo* jump = CCJumpTo::create(1, pointe_c,height*0.2,1);
+                    pSprite_c->runAction( CCSequence::create(jump,CCCallFuncN::create(pSprite_c,callfuncN_selector(Play::closeHat)), NULL));
                     pSprite_c->setTexture(hat_texture_2);
                     SimpleAudioEngine::sharedEngine()->playEffect("hat.mp3");
 
@@ -405,23 +405,23 @@ void Play::switchLeftCup(){
         
         SimpleAudioEngine::sharedEngine()->playEffect("hat.mp3");
         
-        CCJumpTo* jump2b = CCJumpTo::actionWithDuration(switch_speed, pointe_b,height*0.2,1);
-        CCJumpTo* jump2a = CCJumpTo::actionWithDuration(switch_speed, pointe_a,height*0.2,1);
+        CCJumpTo* jump2b = CCJumpTo::create(switch_speed, pointe_b,height*0.2,1);
+        CCJumpTo* jump2a = CCJumpTo::create(switch_speed, pointe_a,height*0.2,1);
         
-        pSprite_a->runAction(CCSequence::actions(jump2b,NULL));
-        pSprite_b->runAction(CCSequence::actions(jump2a,NULL));
+        pSprite_a->runAction(CCSequence::create(jump2b,NULL));
+        pSprite_b->runAction(CCSequence::create(jump2a,NULL));
         
-        CCMoveTo* move2b = CCMoveTo::actionWithDuration(switch_speed, shadow_pointe_b);
-        CCMoveTo* move2a = CCMoveTo::actionWithDuration(switch_speed, shadow_pointe_a);
-        CCScaleTo* sc1 = CCScaleTo::actionWithDuration(switch_speed/2.0, 0.6*scale);
-        CCScaleTo* sc2 = CCScaleTo::actionWithDuration(switch_speed/2.0, 1*scale);
-        CCScaleTo* sc3 = CCScaleTo::actionWithDuration(switch_speed/2.0, 0.6*scale);
-        CCScaleTo* sc4 = CCScaleTo::actionWithDuration(switch_speed/2.0, 1*scale);
-        CCFiniteTimeAction *sq1 = CCSequence::actions(sc1,sc2,NULL);
-        CCFiniteTimeAction *sq2 = CCSequence::actions(sc3,sc4,NULL);
+        CCMoveTo* move2b = CCMoveTo::create(switch_speed, shadow_pointe_b);
+        CCMoveTo* move2a = CCMoveTo::create(switch_speed, shadow_pointe_a);
+        CCScaleTo* sc1 = CCScaleTo::create(switch_speed/2.0, 0.6*scale);
+        CCScaleTo* sc2 = CCScaleTo::create(switch_speed/2.0, 1*scale);
+        CCScaleTo* sc3 = CCScaleTo::create(switch_speed/2.0, 0.6*scale);
+        CCScaleTo* sc4 = CCScaleTo::create(switch_speed/2.0, 1*scale);
+        CCFiniteTimeAction *sq1 = CCSequence::create(sc1,sc2,NULL);
+        CCFiniteTimeAction *sq2 = CCSequence::create(sc3,sc4,NULL);
 
-        pShadow_a->runAction(CCSpawn::actions(move2b,sq1,NULL));
-        pShadow_b->runAction(CCSpawn::actions(move2a,sq2,NULL));
+        pShadow_a->runAction(CCSpawn::create(move2b,sq1,NULL));
+        pShadow_b->runAction(CCSpawn::create(move2a,sq2,NULL));
         
         
         cocos2d::CCSprite* temp = pShadow_b;
@@ -440,24 +440,24 @@ void Play::switchRightCup(){
     if (pSprite_b->numberOfRunningActions()==0&&pSprite_c->numberOfRunningActions()==0) {
         SimpleAudioEngine::sharedEngine()->playEffect("hat.mp3");
         
-        CCJumpTo* jump2b = CCJumpTo::actionWithDuration(switch_speed, pointe_b,height*0.2,1);
-        CCJumpTo* jump2c = CCJumpTo::actionWithDuration(switch_speed, pointe_c,height*0.2,1);
+        CCJumpTo* jump2b = CCJumpTo::create(switch_speed, pointe_b,height*0.2,1);
+        CCJumpTo* jump2c = CCJumpTo::create(switch_speed, pointe_c,height*0.2,1);
         
-        pSprite_c->runAction(CCSequence::actions(jump2b,NULL));
-        pSprite_b->runAction(CCSequence::actions(jump2c,NULL));
+        pSprite_c->runAction(CCSequence::create(jump2b,NULL));
+        pSprite_b->runAction(CCSequence::create(jump2c,NULL));
         
-        CCMoveTo* move2b = CCMoveTo::actionWithDuration(switch_speed, shadow_pointe_b);
-        CCMoveTo* move2c = CCMoveTo::actionWithDuration(switch_speed, shadow_pointe_c);
+        CCMoveTo* move2b = CCMoveTo::create(switch_speed, shadow_pointe_b);
+        CCMoveTo* move2c = CCMoveTo::create(switch_speed, shadow_pointe_c);
         
-        CCScaleTo* sc1 = CCScaleTo::actionWithDuration(switch_speed/2.0, 0.6*scale);
-        CCScaleTo* sc2 = CCScaleTo::actionWithDuration(switch_speed/2.0, 1*scale);
-        CCScaleTo* sc3 = CCScaleTo::actionWithDuration(switch_speed/2.0, 0.6*scale);
-        CCScaleTo* sc4 = CCScaleTo::actionWithDuration(switch_speed/2.0, 1*scale);
-        CCFiniteTimeAction *sq1 = CCSequence::actions(sc1,sc2,NULL);
-        CCFiniteTimeAction *sq2 = CCSequence::actions(sc3,sc4,NULL);
+        CCScaleTo* sc1 = CCScaleTo::create(switch_speed/2.0, 0.6*scale);
+        CCScaleTo* sc2 = CCScaleTo::create(switch_speed/2.0, 1*scale);
+        CCScaleTo* sc3 = CCScaleTo::create(switch_speed/2.0, 0.6*scale);
+        CCScaleTo* sc4 = CCScaleTo::create(switch_speed/2.0, 1*scale);
+        CCFiniteTimeAction *sq1 = CCSequence::create(sc1,sc2,NULL);
+        CCFiniteTimeAction *sq2 = CCSequence::create(sc3,sc4,NULL);
         
-        pShadow_c->runAction(CCSpawn::actions(move2b,sq1,NULL));
-        pShadow_b->runAction(CCSpawn::actions(move2c,sq2,NULL));
+        pShadow_c->runAction(CCSpawn::create(move2b,sq1,NULL));
+        pShadow_b->runAction(CCSpawn::create(move2c,sq2,NULL));
         
         cocos2d::CCSprite* temp = pShadow_b;
         pShadow_b = pShadow_c;
@@ -474,11 +474,11 @@ void Play::switchRightCup(){
 void Play::switchLeftCion(){
     if (pSprite_b->numberOfRunningActions()==0&&pSprite_c->numberOfRunningActions()==0) {
 
-    if (!pCoin->getIsVisible()) {
+    if (!pCoin->isVisible()) {
         CCRect cionRect = pCoin->boundingBox();
-        if( CCRect::CCRectIntersectsRect(pSprite_a->boundingBox(), cionRect)){
+        if(pSprite_a->boundingBox().intersectsRect(cionRect)){
             pCoin->setPosition(pointe_b);
-        }else if( CCRect::CCRectIntersectsRect(pSprite_b->boundingBox(), cionRect)){
+        }else if(pSprite_b->boundingBox().intersectsRect( cionRect)){
             pCoin->setPosition(pointe_a);
         }
         
@@ -489,11 +489,11 @@ void Play::switchRightCion(){
     
     if (pSprite_b->numberOfRunningActions()==0&&pSprite_c->numberOfRunningActions()==0) {
 
-    if (!pCoin->getIsVisible()) {
+    if (!pCoin->isVisible()) {
         CCRect cionRect = pCoin->boundingBox();
-        if( CCRect::CCRectIntersectsRect(pSprite_b->boundingBox(), cionRect)){
+        if(pSprite_b->boundingBox().intersectsRect(cionRect)){
             pCoin->setPosition(pointe_c);
-        }else if ( CCRect::CCRectIntersectsRect(pSprite_c->boundingBox(), cionRect)) {
+        }else if (pSprite_c->boundingBox().intersectsRect(cionRect)) {
             pCoin->setPosition(pointe_b);
         }
     }
@@ -511,56 +511,57 @@ void Play::resetSpeed(){
 
 void Play::menuCloseCallback(CCObject* pSender)
 {
-    if (pCoin->getIsVisible()==false) {
+    if (pCoin->isVisible()==false) {
         CCPoint point = pCoin->getPosition();
         point.y=height*0.2;
-        CCMoveTo* moveto = CCMoveTo::actionWithDuration(1, point);
+
+        CCMoveTo* moveto = CCMoveTo::create(1, point);
         pCoin->setScale(0.6*this->scale);
-        CCScaleTo* scale=CCScaleTo::actionWithDuration(1, this->scale); 
-        CCRotateTo *rot = CCRotateTo::actionWithDuration(0.1, 20);
-        CCRotateTo *rot2 = CCRotateTo::actionWithDuration(0.1, -20);
-        CCRotateTo *rot3 = CCRotateTo::actionWithDuration(0.1, 10);
-        CCRotateTo *rot4 = CCRotateTo::actionWithDuration(0.1, -10);
-        CCRotateTo *rot5 = CCRotateTo::actionWithDuration(0.1, 0);
-        pCoin->runAction( CCSpawn::actions(scale,CCSequence::actions(moveto,CCCallFuncN::actionWithTarget(pCoin,callfuncN_selector(Play::playCoinMp3)),rot,rot2,rot3,rot4,rot5,NULL),NULL));
+        CCScaleTo* scale=CCScaleTo::create(1, this->scale); 
+        CCRotateTo *rot = CCRotateTo::create(0.1, 20);
+        CCRotateTo *rot2 = CCRotateTo::create(0.1, -20);
+        CCRotateTo *rot3 = CCRotateTo::create(0.1, 10);
+        CCRotateTo *rot4 = CCRotateTo::create(0.1, -10);
+        CCRotateTo *rot5 = CCRotateTo::create(0.1, 0);
+        pCoin->runAction( CCSpawn::create(scale,CCSequence::create(moveto,CCCallFuncN::create(pCoin,callfuncN_selector(Play::playCoinMp3)),rot,rot2,rot3,rot4,rot5,NULL),NULL));
     }
    
-    pCoin->setIsVisible(true);
+    pCoin->setVisible(true);
     isLayoutCoin = true;
     isInCup = false;
 
-    if( CCRect::CCRectIntersectsRect(pSprite_a->boundingBox(), pCoin->boundingBox())){
-        CCScaleTo* sc1 = CCScaleTo::actionWithDuration(switch_speed/2.0, 0.6*scale);
-        CCScaleTo* sc2 = CCScaleTo::actionWithDuration(switch_speed/2.0, 1*scale);
-        CCFiniteTimeAction *sq1 = CCSequence::actions(sc1,sc2,NULL);
+    if(pSprite_a->boundingBox().intersectsRect(pCoin->boundingBox())){
+        CCScaleTo* sc1 = CCScaleTo::create(switch_speed/2.0, 0.6*scale);
+        CCScaleTo* sc2 = CCScaleTo::create(switch_speed/2.0, 1*scale);
+        CCFiniteTimeAction *sq1 = CCSequence::create(sc1,sc2,NULL);
         pShadow_a->runAction(sq1);
         
-        CCJumpTo* jump = CCJumpTo::actionWithDuration(1, pointe_a,height*0.2,1);
-        pSprite_a->runAction( CCSequence::actions(jump,CCCallFuncN::actionWithTarget(pSprite_a,callfuncN_selector(Play::closeHat)), NULL));
+        CCJumpTo* jump = CCJumpTo::create(1, pointe_a,height*0.2,1);
+        pSprite_a->runAction( CCSequence::create(jump,CCCallFuncN::create(pSprite_a,callfuncN_selector(Play::closeHat)), NULL));
        
         pSprite_a->setTexture(hat_texture_2);
         SimpleAudioEngine::sharedEngine()->playEffect("hat.mp3");
         
 
-    }else if( CCRect::CCRectIntersectsRect(pSprite_b->boundingBox(), pCoin->boundingBox())){
-        CCScaleTo* sc1 = CCScaleTo::actionWithDuration(switch_speed/2.0, 0.6*scale);
-        CCScaleTo* sc2 = CCScaleTo::actionWithDuration(switch_speed/2.0, 1*scale);
-        CCFiniteTimeAction *sq1 = CCSequence::actions(sc1,sc2,NULL);
+    }else if(pSprite_b->boundingBox().intersectsRect(pCoin->boundingBox())){
+        CCScaleTo* sc1 = CCScaleTo::create(switch_speed/2.0, 0.6*scale);
+        CCScaleTo* sc2 = CCScaleTo::create(switch_speed/2.0, 1*scale);
+        CCFiniteTimeAction *sq1 = CCSequence::create(sc1,sc2,NULL);
         pShadow_b->runAction(sq1);
-        CCJumpTo* jump = CCJumpTo::actionWithDuration(1, pointe_b,height*0.2,1);
-        pSprite_b->runAction( CCSequence::actions(jump,CCCallFuncN::actionWithTarget(pSprite_b,callfuncN_selector(Play::closeHat)), NULL));
+        CCJumpTo* jump = CCJumpTo::create(1, pointe_b,height*0.2,1);
+        pSprite_b->runAction( CCSequence::create(jump,CCCallFuncN::create(pSprite_b,callfuncN_selector(Play::closeHat)), NULL));
         pSprite_b->setTexture(hat_texture_2);
         SimpleAudioEngine::sharedEngine()->playEffect("hat.mp3");
         
 
 
-    }else if ( CCRect::CCRectIntersectsRect(pSprite_c->boundingBox(), pCoin->boundingBox())) {
-        CCScaleTo* sc1 = CCScaleTo::actionWithDuration(switch_speed/2.0, 0.6*scale);
-        CCScaleTo* sc2 = CCScaleTo::actionWithDuration(switch_speed/2.0, 1*scale);
-        CCFiniteTimeAction *sq1 = CCSequence::actions(sc1,sc2,NULL);
+    }else if (pSprite_c->boundingBox().intersectsRect(pCoin->boundingBox())) {
+        CCScaleTo* sc1 = CCScaleTo::create(switch_speed/2.0, 0.6*scale);
+        CCScaleTo* sc2 = CCScaleTo::create(switch_speed/2.0, 1*scale);
+        CCFiniteTimeAction *sq1 = CCSequence::create(sc1,sc2,NULL);
         pShadow_c->runAction(sq1);
-        CCJumpTo* jump = CCJumpTo::actionWithDuration(1, pointe_c,height*0.2,1);
-        pSprite_c->runAction( CCSequence::actions(jump,CCCallFuncN::actionWithTarget(pSprite_c,callfuncN_selector(Play::closeHat)), NULL));
+        CCJumpTo* jump = CCJumpTo::create(1, pointe_c,height*0.2,1);
+        pSprite_c->runAction( CCSequence::create(jump,CCCallFuncN::create(pSprite_c,callfuncN_selector(Play::closeHat)), NULL));
         pSprite_c->setTexture(hat_texture_2);
         SimpleAudioEngine::sharedEngine()->playEffect("hat.mp3");
         
@@ -576,7 +577,7 @@ void Play::menuCloseCallback(CCObject* pSender)
 }
 void Play::menuSettingCallback(CCObject* pSender)
 {
-    pSettingMenu->setIsVisible(true);
+    pSettingMenu->setVisible(true);
 
     //CCDirector::sharedDirector()->end();
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)

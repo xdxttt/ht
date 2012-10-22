@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright 2009 lhunath (Maarten Billemont)
 
 http://www.cocos2d-x.org
@@ -29,7 +29,12 @@ THE SOFTWARE.
 
 NS_CC_BEGIN
 
-class CCActionTweenDelegate
+/**
+ * @addtogroup actions
+ * @{
+ */
+
+class CC_DLL CCActionTweenDelegate
 {
 public:
     virtual ~CCActionTweenDelegate() {}
@@ -45,7 +50,7 @@ public:
     [target runAction:modifyWidth];
 
 
- Another example: CCScaleTo action could be rewriten using CCPropertyAction:
+ Another example: CCScaleTo action could be rewritten using CCPropertyAction:
 
     // scaleA and scaleB are equivalents
     id scaleA = [CCScaleTo actionWithDuration:2 scale:3];
@@ -54,23 +59,29 @@ public:
 
  @since v0.99.2
  */
-class CCActionTween : public CCActionInterval
+class CC_DLL CCActionTween : public CCActionInterval
 {
 public:
+    /** creates an initializes the action with the property name (key), and the from and to parameters. 
+    @deprecated: This interface will be deprecated sooner or later.
+    */
+    CC_DEPRECATED_ATTRIBUTE static CCActionTween* actionWithDuration(float aDuration, const char* key, float from, float to);
     /** creates an initializes the action with the property name (key), and the from and to parameters. */
-    static CCActionTween* actionWithDuration(ccTime aDuration, const char* key, float from, float to);
-
+    static CCActionTween* create(float aDuration, const char* key, float from, float to);
     /** initializes the action with the property name (key), and the from and to parameters. */
-    bool initWithDuration(ccTime aDuration, const char* key, float from, float to);
+    bool initWithDuration(float aDuration, const char* key, float from, float to);
 
     void startWithTarget(CCNode *pTarget);
-    void update(ccTime dt);
+    void update(float dt);
     CCActionInterval* reverse();
 
     std::string        m_strKey;
     float            m_fFrom, m_fTo;
     float            m_fDelta;
 };
+
+// end of actions group
+/// @}
 
 NS_CC_END
 

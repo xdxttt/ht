@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2008-2010 Ricardo Quesada
 Copyright (c) 2011      Zynga Inc.
 
@@ -25,15 +25,20 @@ THE SOFTWARE.
 ****************************************************************************/
 #ifndef __CCTILE_MAP_ATLAS__
 #define __CCTILE_MAP_ATLAS__
-#include <string>
-#include <map>
-#include "CCAtlasNode.h"
+
+
+#include "base_nodes/CCAtlasNode.h"
 
 NS_CC_BEGIN
 
-typedef std::map<std::string, int> StringToIntegerDictionary;
-typedef std::pair<std::string, int> StringToIntegerPair;
 struct sImageTGA;
+class CCDictionary;
+
+/**
+ * @addtogroup tilemap_parallax_nodes
+ * @{
+ */
+
 /** @brief CCTileMapAtlas is a subclass of CCAtlasNode.
 
 It knows how to render a map based of tiles.
@@ -58,8 +63,15 @@ public:
     virtual ~CCTileMapAtlas();
     /** creates a CCTileMap with a tile file (atlas) with a map file and the width and height of each tile in points.
     The tile file will be loaded using the TextureMgr.
+    @deprecated: This interface will be deprecated sooner or later.
     */
-    static CCTileMapAtlas * tileMapAtlasWithTileFile(const char *tile, const char *mapFile, int tileWidth, int tileHeight);
+    CC_DEPRECATED_ATTRIBUTE static CCTileMapAtlas * tileMapAtlasWithTileFile(const char *tile, const char *mapFile, int tileWidth, int tileHeight);
+    
+    /** creates a CCTileMap with a tile file (atlas) with a map file and the width and height of each tile in points.
+    The tile file will be loaded using the TextureMgr.
+    */
+    static CCTileMapAtlas * create(const char *tile, const char *mapFile, int tileWidth, int tileHeight);
+   
     /** initializes a CCTileMap with a tile file (atlas) with a map file and the width and height of each tile in points.
     The file will be loaded using the TextureMgr.
     */
@@ -81,11 +93,14 @@ private:
     void updateAtlasValues();
 
 protected:
-    //! x,y to altas dicctionary
-    StringToIntegerDictionary *m_pPosToAtlasIndex;
+    //! x,y to atlas dictionary
+    CCDictionary* m_pPosToAtlasIndex;
     //! numbers of tiles to render
-    int                m_nItemsToRender;
+    int m_nItemsToRender;
 };
+
+// end of tilemap_parallax_nodes group
+/// @}
 
 NS_CC_END
 
